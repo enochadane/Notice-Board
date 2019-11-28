@@ -1,0 +1,20 @@
+body{
+    background-color: rgb(17, 17, 235);
+}
+
+.form-container {
+    border: 0px solid #fff; padding:50px 60px;
+    /* background: #fff; */
+    -webkit-box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);
+    -moz-box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);
+    box-shadow: -1px 4px 26px 11px rgba(0,0,0,0.75);
+}
+
+.jumbotron {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.footer{
+    margin-bottom: 0 !important;
+}

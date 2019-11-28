@@ -1,0 +1,7 @@
+{{ define "home.layout" }}
+
+{{ template "navbar" . }}
+{{ template "home.content" . }}
+{{ template "footer" . }}
+
+{{ end }}

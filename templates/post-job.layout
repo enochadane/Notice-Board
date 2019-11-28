@@ -1,0 +1,7 @@
+{{ define "post-job.layout"}}
+
+{{ template "navbar" . }}
+{{ template "post-job.content" . }}
+{{ template "footer" . }}
+
+{{ end }}
