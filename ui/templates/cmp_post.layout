@@ -1,0 +1,5 @@
+{{ define "cmp_post.layout" }}
+{{ template "cmp_navbar" . }}
+{{ template "cmp_post.content" . }}
+{{ template "footer" . }}
+{{ end }}

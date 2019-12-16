@@ -18,19 +18,16 @@ func NewCompanyHandler(T *template.Template, CS model.CompanyService) *CompanyHa
 	return &CompanyHandler{tmpl: T, companySrv: CS}
 }
 
+func (ch *CompanyHandler) Admin(w http.ResponseWriter, r *http.Request) {
+	ch.tmpl.ExecuteTemplate(w, "cmp_index.layout", nil)
+}
+
 func (ch *CompanyHandler) Signin(w http.ResponseWriter, r *http.Request) {
-
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-	ch.tmpl.ExecuteTemplate(w, "signin.layout", nil)
-
+	ch.tmpl.ExecuteTemplate(w, "cmp_signin.layout", nil)
 }
 
 func (ch *CompanyHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "signup.layout", nil)
+	ch.tmpl.ExecuteTemplate(w, "cmp_signup.layout", nil)
 }
 
 func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -47,16 +44,15 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		for _, cmp := range companies {
 			if cmp.Email == email && cmp.Password == password {
 				fmt.Println("authentication successfull! ")
-				http.Redirect(w, r, "/home", http.StatusSeeOther)
+				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 				break
 			
 			} else {
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
-				fmt.Println("No such user!")
+				fmt.Println("No such Company!")
 			}
 		}
 	} else {
-		ch.tmpl.ExecuteTemplate(w, "signin.layout", nil)
+		ch.tmpl.ExecuteTemplate(w, "cmp_signin.layout", nil)
 	}
 }
 
@@ -72,14 +68,14 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		companies, _ := ch.companySrv.Companies()
 
-		for _, company := range companies {
+		// for _, company := range companies {
 			
-			if cmp.Email == company.Email {
-				http.Redirect(w, r, "/signup", http.StatusSeeOther)
-				fmt.Println("This Email is already in use! ")
-				return
-			}
-		}
+		// 	if cmp.Email == company.Email {
+		// 		http.Redirect(w, r, "/cmp_signup", http.StatusSeeOther)
+		// 		fmt.Println("This Email is already in use! ")
+		// 		return
+		// 	}
+		// }
 
 		if cmp.Password == confirmpass {
 
@@ -93,21 +89,20 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 			fmt.Println(cmp)
 
-			fmt.Println("User added to db")
+			fmt.Println("Company added to db")
 
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Redirect(w, r, "/cmp-login", http.StatusSeeOther)
 
 		} else {
-			http.Redirect(w, r, "/signup", http.StatusSeeOther)
 			fmt.Println("Password doesn't match! ")
 		}
 		
 	} else {
-		ch.tmpl.ExecuteTemplate(w, "signup.layout", nil)
+		ch.tmpl.ExecuteTemplate(w, "cmp_signup.layout", nil)
 	}
 
 }
 
 func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "home.layout", nil)
+	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", nil)
 }

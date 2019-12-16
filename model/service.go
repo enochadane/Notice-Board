@@ -17,3 +17,11 @@ type CompanyService interface {
 	DeleteCompany(id int) error
 	StoreCompany(company entity.Company) error
 }
+
+type PostService interface {
+	Posts() ([]entity.Post, error)
+	Post(id int) (entity.Post, error)
+	UpdatePost(post entity.Post) error
+	DeletePost(id int) error
+	StorePost(post entity.Post) error
+}

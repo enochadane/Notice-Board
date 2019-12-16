@@ -20,6 +20,12 @@ const (
 	dbname   = "noticeboard"
 )
 
+var tmpl *template.Template
+
+func init() {
+	tmpl = template.Must(template.ParseGlob("../../ui/templates/*"))
+}
+
 func main()  {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
@@ -39,33 +45,57 @@ func main()  {
 
 	fmt.Println("DB connection established")
 
-	tmpl := template.Must(template.ParseGlob("../../ui/templates/*"))
+	// tmpl := template.Must(template.ParseGlob("../../ui/templates/*"))
 
 	userRepo := repository.NewUserRepositoryImpl(dbconn)
 	userSrv := service.NewUserServiceImpl(userRepo)
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv)
 
-	// companyRepo := repository.NewCompanyRepositoryImpl(dbconn)
-	// companySrv := service.NewCompanyServiceImpl(companyRepo)
+	companyRepo := repository.NewCompanyRepositoryImpl(dbconn)
+	companySrv := service.NewCompanyServiceImpl(companyRepo)
 
-	// cmpHandler := handler.NewCompanyHandler(tmpl, companySrv)
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv)
 
-	// mux := http.NewServeMux()
+	postRepo := repository.NewPostRepositoryImpl(dbconn)
+	postSrv := service.NewPostServiceImpl(postRepo)
+
+	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv)
+
+	mux := http.NewServeMux()
 	
 	// Server CSS, JS & Images Statically.
 	fs := http.FileServer(http.Dir("../../ui/assets"))
-	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 	
-	http.HandleFunc("/", usrHandler.Signin)
-	http.HandleFunc("/signup", usrHandler.Signup)
-	http.HandleFunc("/home", usrHandler.Home)
-
-	http.HandleFunc("/signup_account", usrHandler.CreateAccount)
-	http.HandleFunc("/login", usrHandler.Login)
+	mux.HandleFunc("/", Index)
 	
-	// mux.HandleFunc("/signup_account", cmpHandler.CreateAccount)
-	// mux.HandleFunc("/login", cmpHandler.Login)
+	mux.HandleFunc("/signin", usrHandler.Signin)
+	mux.HandleFunc("/signin/signup", usrHandler.Signup)
+	mux.HandleFunc("/login", usrHandler.Login)
+	mux.HandleFunc("/signup_account", usrHandler.CreateAccount)
+	mux.HandleFunc("/home", usrHandler.Home)
+	
+	mux.HandleFunc("/cmp-signin", cmpHandler.Signin)
+	mux.HandleFunc("/cmp-signup", cmpHandler.Signup)
+	mux.HandleFunc("/cmp-login", cmpHandler.Login)
+	mux.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
+	mux.HandleFunc("/cmp-home", cmpHandler.Home)
+	mux.HandleFunc("/admin", cmpHandler.Admin)
 
-	http.ListenAndServe(":8080", nil)
+	mux.HandleFunc("/admin/post-job", postHandler.CompanyPostsNew)
+	mux.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
+
+	http.ListenAndServe(":8080", mux)
+}
+
+func Index(w http.ResponseWriter, r *http.Request) {
+
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "index.layout", nil)
+
 }

@@ -19,14 +19,7 @@ func NewUserHandler(T *template.Template, US model.UserService) *UserHandler {
 }
 
 func (uh *UserHandler) Signin(w http.ResponseWriter, r *http.Request) {
-
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
 	uh.tmpl.ExecuteTemplate(w, "signin.layout", nil)
-
 }
 
 func (uh *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +42,6 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 				break
 			
 			} else {
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				fmt.Println("No such user!")
 			}
 		}

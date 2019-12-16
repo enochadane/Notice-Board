@@ -74,7 +74,7 @@ func (ci *CompanyRepositoryImpl) DeleteCompany(id int) error {
 
 func (ci *CompanyRepositoryImpl) StoreCompany(c entity.Company) error {
 	
-	_, err := ci.conn.Exec("INSERT INTO users (name,email,password) values($1, $2, $3)", c.Name, c.Email, c.Password)
+	_, err := ci.conn.Exec("INSERT INTO companies (name,email,password) values($1, $2, $3)", c.Name, c.Email, c.Password)
 	if err != nil {
 		return errors.New("Insertion has failed")
 	}

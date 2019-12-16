@@ -1,13 +1,13 @@
-{{ define "signup.content" }}
+{{ define "cmp_signup.content" }}
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-4 col-sm-4 col-xs-12"></div>
             <div class="col-md-4 col-sm-4 col-xs-12">
             
-                <form class="form-container shadow" action="/signup_account" method="POST">
+                <form class="form-container shadow" action="/cmp-signup-account" method="POST">
                     <div class="form-group">
-                        <label for="email">User Name</label>
+                        <label for="email">Company Name</label>
                         <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp" placeholder="User Name">
                     </div>
                     <div class="form-group">
@@ -28,7 +28,7 @@
                         <label class="form-check-label" for="remember">Remember me</label>
                     </div>
                     <button type="submit" class="btn btn-info btn-block">signup</button>
-                    <span><a href="/signin">already have an account >></a></span>
+                    <span><a href="/cmp-signin">already have an account >></a></span>
                 </form>
             
             </div>
