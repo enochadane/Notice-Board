@@ -1,28 +1,34 @@
 {{ define "home.content" }}
 
-    <div class="container-fluid" style="margin-top: 20px;">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-xs-6">
-                            <a href="">Jobs</a>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4 col-sm-4 col-xs-6">
-                            <a href="">Events</a>
-                        </div>
-                    </div>
+            <div class="col-md col-sm-0 col-xs-0">
+                <div class="">
+                    <a href="">Jobs</a>
+                </div>
+                <div class="">
+                    <a href="">Events</a>
+                </div>
+            
+                <div class="">
+                    <a href="">Advertisement</a>
                 </div>
             </div>
             <div class="col-6">
               <div class="container">
-                  <div class="row"></div>
+                  <div class="row">
+                      {{ range . }}
+                      <div class="container-fluid">
+                          <div class="row"> <h4> {{ .Company.Name }} </h4></div>
+                          <div class="row"> <h4> {{ .Title }} </h4></div>
+                          <div class="row"> <p> {{ .Description}} </p></div>
+                          <div class="row"> <img src="/assets/img/{{ .Image }}" width="200rem" height="200rem"/> </div>
+                      </div>
+                      {{ end }}
+                  </div>
               </div>
             </div>
-            <div class="col"></div>
+            <div class="col-md col-sm-0 col-xs-0"></div>
         </div>
     </div>
 

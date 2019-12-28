@@ -15,12 +15,13 @@ import (
 )
 
 type CompanyPostHandler struct {
-	tmpl	*template.Template
-	postSrv model.PostService
+	tmpl		*template.Template
+	postSrv 	model.PostService
+	companySrv 	model.CompanyService
 }
 
-func NewCompanyPostHandler(T *template.Template, PS model.PostService) *CompanyPostHandler {
-	return &CompanyPostHandler{tmpl: T, postSrv: PS}
+func NewCompanyPostHandler(T *template.Template, PS model.PostService, CP model.CompanyService) *CompanyPostHandler {
+	return &CompanyPostHandler{tmpl: T, postSrv: PS, companySrv: CP}
 }
 
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
@@ -33,14 +34,29 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 
 func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("companypostsnew function invoked! ")
+
 	if r.Method == http.MethodPost {
+		
+		idRaw := r.URL.Query().Get("id")
+
+		id, err := strconv.Atoi(idRaw)
+
+		if err != nil {
+			panic(err)
+		}
+
+		// err = cph.companySrv.Company(id)
+
+		fmt.Println("post method verified! ")
 
 		post := entity.Post{}
+		post.CompanyId = id;
 		post.Title = r.FormValue("title")
 		post.Description = r.FormValue("description")
-		post.Type = r.Form.Get("category")
+		post.Category = r.Form.Get("category")
 
-		fmt.Println(post.Type)
+		fmt.Println(post.Category)
 
 		mf, fh, err := r.FormFile("postimg")
 		if err != nil {
@@ -53,13 +69,16 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		writeFile(&mf, fh.Filename)
 
 		err = cph.postSrv.StorePost(post)
-		fmt.Println(post)
+		// cph.postSrv.StorePost(post)
 
 		if err != nil {
 			panic(err)
 		}
+		
+		fmt.Println(post)
+		fmt.Println("post added to db")
 
-		http.Redirect(w, r, "admin/cmp-posts", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 
 	} else {
 
@@ -94,24 +113,24 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 		pst.Id, _ = strconv.Atoi(r.FormValue("id"))
 		pst.Title = r.FormValue("name")
 		pst.Description = r.FormValue("description")
-		pst.Image = r.FormValue("image")
-		pst.Type = r.Form.Get("category")
+		// pst.Image = r.FormValue("image")
+		// pst.Category = r.Form.Get("category")
 
-		mf, _, err := r.FormFile("postimg")
+		// mf, _, err := r.FormFile("postimg")
 
-		if err != nil {
-			panic(err)
-		}
+		// if err != nil {
+		// 	panic(err)
+		// }
 
-		defer mf.Close()
+		// defer mf.Close()
 
-		writeFile(&mf, pst.Image)
+		// writeFile(&mf, pst.Image)
 
-		err = cph.postSrv.UpdatePost(pst)
+		// err = cph.postSrv.UpdatePost(pst)
 
-		if err != nil {
-			panic(err)
-		}
+		// if err != nil {
+		// 	panic(err)
+		// }
 
 		http.Redirect(w, r, "/cmp_home", http.StatusSeeOther)
 

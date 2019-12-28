@@ -5,7 +5,7 @@
         <h2>Menu Categories</h2>
     </div>
     <div class="pt-3 pb-2 mb-3">
-        <a class="btn btn-primary btn-lg" href="/admin/posts/new" role="button">Add Post</a>
+        <a class="btn btn-primary btn-lg" href="/admin/post-job" role="button">Add a Post</a>
     </div>
     <table class="table table-striped">
         <thead>
@@ -19,17 +19,17 @@
           </tr>
         </thead>
         <tbody>
-            <!-- {{ range . }}
+            {{ range . }}
           <tr>
-            <th scope="row"> {{ .ID }} </th>
-            <td> {{ .Name }} </td>
+            <th scope="row"> {{ .Id }} </th>
+            <td> {{ .Title }} </td>
             <td> {{ .Description }} </td>
             <td> <img src="/assets/img/{{ .Image }}" width="70rem" height="70rem" /> </td>
-            <td> <a href="/cmp/posts/update?id={{ .ID }}">Edit</a> </td>
-            <td> <a href="/cmp/posts/delete?id={{ .ID }}">Delete</a> </td>
+            <td> <a href="/cmp/posts/update?id={{ .Id }}">Edit</a> </td>
+            <td> <a href="/cmp/posts/delete?id={{ .Id }}">Delete</a> </td>
           </tr>
-          {{ end }} -->
-          </tbody>
-          </table>
+          {{ end }}
+        </tbody>
+    </table>
 </main>
 {{ end }}

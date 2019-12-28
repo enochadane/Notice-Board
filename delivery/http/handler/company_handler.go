@@ -12,29 +12,30 @@ import (
 type CompanyHandler struct {
 	tmpl		*template.Template
 	companySrv 	model.CompanyService
+	postSrv		model.PostService
 }
 
-func NewCompanyHandler(T *template.Template, CS model.CompanyService) *CompanyHandler {
-	return &CompanyHandler{tmpl: T, companySrv: CS}
+func NewCompanyHandler(T *template.Template, CS model.CompanyService, PS model.PostService) *CompanyHandler {
+	return &CompanyHandler{tmpl: T, companySrv: CS, postSrv: PS}
 }
 
 func (ch *CompanyHandler) Admin(w http.ResponseWriter, r *http.Request) {
 	ch.tmpl.ExecuteTemplate(w, "cmp_index.layout", nil)
 }
 
-func (ch *CompanyHandler) Signin(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "cmp_signin.layout", nil)
+func (ch *CompanyHandler) SignInUp(w http.ResponseWriter, r *http.Request) {
+	ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", nil)
 }
 
-func (ch *CompanyHandler) Signup(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "cmp_signup.layout", nil)
-}
+// func (ch *CompanyHandler) Signup(w http.ResponseWriter, r *http.Request) {
+// 	ch.tmpl.ExecuteTemplate(w, "cmp_signup.layout", nil)
+// }
 
 func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 
-		email := r.FormValue("email")
-		password := r.FormValue("password")
+		email := r.FormValue("companyemail")
+		password := r.FormValue("companypassword")
 
 		companies, err := ch.companySrv.Companies()
 		if err != nil {
@@ -52,7 +53,7 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
-		ch.tmpl.ExecuteTemplate(w, "cmp_signin.layout", nil)
+		ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", nil)
 	}
 }
 
@@ -61,48 +62,48 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 	if r.Method == http.MethodPost {
 		
 		cmp := entity.Company{}
-		cmp.Name = r.FormValue("username")
-		cmp.Email = r.FormValue("useremail")
-		cmp.Password = r.FormValue("password")
-		confirmpass := r.FormValue("confirmPassword")
+		cmp.Name = r.FormValue("companyname")
+		cmp.Email = r.FormValue("companyemail")
+		cmp.Password = r.FormValue("companypassword")
+		// confirmpass := r.FormValue("confirmPassword")
 
 		companies, _ := ch.companySrv.Companies()
 
-		// for _, company := range companies {
+		for _, company := range companies {
 			
-		// 	if cmp.Email == company.Email {
-		// 		http.Redirect(w, r, "/cmp_signup", http.StatusSeeOther)
-		// 		fmt.Println("This Email is already in use! ")
-		// 		return
-		// 	}
-		// }
-
-		if cmp.Password == confirmpass {
-
-			err := ch.companySrv.StoreCompany(cmp)
-
-			if err != nil {
-				panic(err)
+			if cmp.Email == company.Email {
+				http.Redirect(w, r, "/cmp", http.StatusSeeOther)
+				fmt.Println("This Email is already in use! ")
+				return
 			}
-
-			fmt.Println(companies)
-
-			fmt.Println(cmp)
-
-			fmt.Println("Company added to db")
-
-			http.Redirect(w, r, "/cmp-login", http.StatusSeeOther)
-
-		} else {
-			fmt.Println("Password doesn't match! ")
 		}
+
+		err := ch.companySrv.StoreCompany(cmp)
+
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(companies)
+
+		fmt.Println(cmp)
+
+		fmt.Println("Company added to db")
+
+		http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
+
 		
 	} else {
-		ch.tmpl.ExecuteTemplate(w, "cmp_signup.layout", nil)
+		ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", nil)
 	}
 
 }
 
 func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", nil)
+	posts, _ := ch.postSrv.Posts()
+	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", posts)
+}
+
+func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
+	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
 }

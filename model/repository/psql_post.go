@@ -27,7 +27,7 @@ func (pri *PostRepositoryImpl) Posts() ([]entity.Post, error) {
 
 	for rows.Next() {
 		post := entity.Post{}
-		err := rows.Scan(&post.Id, &post.Title, &post.Description, &post.Image, &post.Type)
+		err := rows.Scan(&post.Id, &post.CompanyId, &post.Title, &post.Description, &post.Image, &post.Category)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
 
 	post := entity.Post{}
 
-	err := row.Scan(&post.Id, &post.Title, &post.Description, &post.Image, &post.Type)
+	err := row.Scan(&post.Id, &post.CompanyId, &post.Title, &post.Description, &post.Image, &post.Category)
 	if err != nil {
 		return post, err
 	}
@@ -55,10 +55,10 @@ func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
 
 func (pri *PostRepositoryImpl) UpdatePost(post entity.Post) error {
 	
-	_, err := pri.conn.Exec("UPDATE posts SET title=$1, description=$2, image=$3, type=$4 WHERE id=$5", post.Title, post.Description, post.Image, post.Type, post.Id)
-	if err != nil {
-		return errors.New("Update has failed")
-	}
+	// _, err := pri.conn.Exec("UPDATE posts SET title=$1, description=$2, image=$3, category=$4 WHERE id=$5", post.Title, post.Description, post.Image, post.Category, post.Id)
+	// if err != nil {
+	// 	return errors.New("Update has failed")
+	// }
 
 	return nil
 }
@@ -75,7 +75,7 @@ func (pri *PostRepositoryImpl) DeletePost(id int) error {
 
 func (pri *PostRepositoryImpl) StorePost(post entity.Post) error {
 	
-	_, err := pri.conn.Exec("INSERT INTO posts (title,description,image,type) values($1, $2, $3, $4)", post.Title, post.Description, post.Image, post.Type)
+	_, err := pri.conn.Exec("INSERT INTO posts (company_id,title,description,image,category) values($1, $2, $3,$4,$5)", post.CompanyId, post.Title, post.Description, post.Image, post.Category)
 	if err != nil {
 		return errors.New("Insertion has failed")
 	}

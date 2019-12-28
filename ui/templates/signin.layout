@@ -1,7 +1,0 @@
-{{ define "signin.layout" }}
-
-{{ template "header" . }}
-{{ template "signin.content" . }}
-{{ template "footer" . }}
-
-{{ end }}

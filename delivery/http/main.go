@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"database/sql"
 	_ "github.com/lib/pq"
+	"github.com/gorilla/mux"
 
 	"NoticeBoard/model/repository"
 	"NoticeBoard/model/service"
@@ -47,46 +48,53 @@ func main()  {
 
 	// tmpl := template.Must(template.ParseGlob("../../ui/templates/*"))
 
-	userRepo := repository.NewUserRepositoryImpl(dbconn)
-	userSrv := service.NewUserServiceImpl(userRepo)
-
-	usrHandler := handler.NewUserHandler(tmpl, userSrv)
 
 	companyRepo := repository.NewCompanyRepositoryImpl(dbconn)
 	companySrv := service.NewCompanyServiceImpl(companyRepo)
 
-	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv)
-
 	postRepo := repository.NewPostRepositoryImpl(dbconn)
 	postSrv := service.NewPostServiceImpl(postRepo)
 
-	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv)
+	userRepo := repository.NewUserRepositoryImpl(dbconn)
+	userSrv := service.NewUserServiceImpl(userRepo)
 
-	mux := http.NewServeMux()
+	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
+
+
+	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv)
+
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv)
+
+	// mux := http.NewServeMux()
+	r := mux.NewRouter()
 	
 	// Server CSS, JS & Images Statically.
-	fs := http.FileServer(http.Dir("../../ui/assets"))
-	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
-	
-	mux.HandleFunc("/", Index)
-	
-	mux.HandleFunc("/signin", usrHandler.Signin)
-	mux.HandleFunc("/signin/signup", usrHandler.Signup)
-	mux.HandleFunc("/login", usrHandler.Login)
-	mux.HandleFunc("/signup_account", usrHandler.CreateAccount)
-	mux.HandleFunc("/home", usrHandler.Home)
-	
-	mux.HandleFunc("/cmp-signin", cmpHandler.Signin)
-	mux.HandleFunc("/cmp-signup", cmpHandler.Signup)
-	mux.HandleFunc("/cmp-login", cmpHandler.Login)
-	mux.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
-	mux.HandleFunc("/cmp-home", cmpHandler.Home)
-	mux.HandleFunc("/admin", cmpHandler.Admin)
+	// fs := http.FileServer(http.Dir("../../ui/assets"))
+	// r.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
-	mux.HandleFunc("/admin/post-job", postHandler.CompanyPostsNew)
-	mux.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
+	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
+	
+	r.HandleFunc("/", Index)
+	
+	// r.HandleFunc("/signin", usrHandler.Signin)
+	// r.HandleFunc("/signup", usrHandler.Signup)
+	r.HandleFunc("/login", usrHandler.Login)
+	r.HandleFunc("/signup_account", usrHandler.CreateAccount)
+	r.HandleFunc("/home", usrHandler.Home)
+	
+	// r.HandleFunc("/cmp-signin", cmpHandler.Signin)
+	// r.HandleFunc("/cmp-signup", cmpHandler.Signup)
+	r.HandleFunc("/cmp", cmpHandler.SignInUp)
+	r.HandleFunc("/cmp-login", cmpHandler.Login)
+	r.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
+	r.HandleFunc("/cmp-home", cmpHandler.Home)
+	r.HandleFunc("/admin", cmpHandler.Admin)
+	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
 
-	http.ListenAndServe(":8080", mux)
+	r.HandleFunc("/admin/post-job", postHandler.CompanyPostsNew)
+	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
+
+	http.ListenAndServe(":8080", r)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +104,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "index.layout", nil)
+	tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 
 }

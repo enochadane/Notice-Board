@@ -1,7 +1,0 @@
-{{ define "index.layout" }}
-
-{{ template "header" . }}
-{{ template "index.content" . }}
-{{ template "footer" . }}
-
-{{ end }}
