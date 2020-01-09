@@ -1,22 +1,23 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
-	"database/sql"
+
 	_ "github.com/lib/pq"
 
-	"NoticeBoard/model/repository"
-	"NoticeBoard/model/service"
-	"NoticeBoard/delivery/http/handler"
+	"github.com/motikingo/Notice-Board/delivery/http/handler"
+	"github.com/motikingo/Notice-Board/model/repository"
+	"github.com/motikingo/Notice-Board/model/service"
 )
 
 const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "godisgood"
+	password = "kingo"
 	dbname   = "noticeboard"
 )
 
@@ -26,10 +27,10 @@ func init() {
 	tmpl = template.Must(template.ParseGlob("../../ui/templates/*"))
 }
 
-func main()  {
+func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-    "password=%s dbname=%s sslmode=disable",
-	host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
 
 	dbconn, err := sql.Open("postgres", psqlInfo)
 
@@ -63,21 +64,25 @@ func main()  {
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv)
 
 	mux := http.NewServeMux()
-	
+
 	// Server CSS, JS & Images Statically.
 	fs := http.FileServer(http.Dir("../../ui/assets"))
 	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
-	
+
 	mux.HandleFunc("/", Index)
-	
-	mux.HandleFunc("/signin", usrHandler.Signin)
-	mux.HandleFunc("/signin/signup", usrHandler.Signup)
+
+	mux.HandleFunc("/User", usrHandler.UserForm)
+
+	// mux.HandleFunc("/signin", usrHandler.Signin)
+	// mux.HandleFunc("/signin/signup", usrHandler.Signup)
 	mux.HandleFunc("/login", usrHandler.Login)
+	mux.HandleFunc("/loginCamp", cmpHandler.Login)
 	mux.HandleFunc("/signup_account", usrHandler.CreateAccount)
+	mux.HandleFunc("/signup_accountCamp", cmpHandler.CreateAccount)
 	mux.HandleFunc("/home", usrHandler.Home)
-	
+
 	mux.HandleFunc("/cmp-signin", cmpHandler.Signin)
-	mux.HandleFunc("/cmp-signup", cmpHandler.Signup)
+	mux.HandleFunc("/company", cmpHandler.Signup)
 	mux.HandleFunc("/cmp-login", cmpHandler.Login)
 	mux.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
 	mux.HandleFunc("/cmp-home", cmpHandler.Home)
@@ -89,6 +94,7 @@ func main()  {
 	http.ListenAndServe(":8080", mux)
 }
 
+// Index ...
 func Index(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {

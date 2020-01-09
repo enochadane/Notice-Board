@@ -1,20 +1,23 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/motikingo/Notice-Board/entity"
+	"github.com/motikingo/Notice-Board/model"
 )
 
+//CompanyServiceImpl ...
 type CompanyServiceImpl struct {
 	companyRepo model.CompanyRepository
 }
 
+// NewCompanyServiceImpl ...
 func NewCompanyServiceImpl(CompanyRepos model.CompanyRepository) *CompanyServiceImpl {
 	return &CompanyServiceImpl{companyRepo: CompanyRepos}
 }
 
-func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error)  {
-	
+//Companies ...
+func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error) {
+
 	companies, err := cs.companyRepo.Companies()
 
 	if err != nil {
@@ -24,8 +27,9 @@ func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error)  {
 	return companies, nil
 }
 
+// StoreCompany ...
 func (cs *CompanyServiceImpl) StoreCompany(company entity.Company) error {
-	
+
 	err := cs.companyRepo.StoreCompany(company)
 
 	if err != nil {
@@ -35,6 +39,7 @@ func (cs *CompanyServiceImpl) StoreCompany(company entity.Company) error {
 	return nil
 }
 
+// Company ...
 func (cs *CompanyServiceImpl) Company(id int) (entity.Company, error) {
 
 	c, err := cs.companyRepo.Company(id)
@@ -46,8 +51,9 @@ func (cs *CompanyServiceImpl) Company(id int) (entity.Company, error) {
 	return c, nil
 }
 
+// UpdateCompany ...
 func (cs *CompanyServiceImpl) UpdateCompany(company entity.Company) error {
-	
+
 	err := cs.companyRepo.UpdateCompany(company)
 
 	if err != nil {
@@ -57,8 +63,9 @@ func (cs *CompanyServiceImpl) UpdateCompany(company entity.Company) error {
 	return nil
 }
 
+// DeleteCompany ...
 func (cs *CompanyServiceImpl) DeleteCompany(id int) error {
-	
+
 	err := cs.companyRepo.DeleteCompany(id)
 
 	if err != nil {
@@ -67,4 +74,3 @@ func (cs *CompanyServiceImpl) DeleteCompany(id int) error {
 
 	return nil
 }
-

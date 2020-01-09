@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Notice_board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="../assets/styles/index.css">
+
+</head>
+
+<body>
+
+    <div class="jumbotron jumbotron-fluid bg-info text-white fixed-top">
+        <div class="container">
+            <h1>Info Lehulum</h1>
+            <div class="row">
+                <p class="display-6">Join our community and get updated!!</p>
+                <a href="/User"><button class="my-ghost jmb-btn">User</button></a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="center-align-form">
+        <div class="my-container container-fluid" id="container">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="my-form-container my-sign-up-container" id="signup">
+                <form action="/signup_accountCamp" method="POST">
+                    <h1>Create Account</h1>
+
+                    <span>or use your email for registration</span>
+                    <input name="companyname" type="text" placeholder="Name" />
+                    <input name="companyemail" type="email" placeholder="Email" />
+                    <input name="companypassword" type="password" placeholder="Password" />
+                    <input name="confirmPassword" type="password" placeholder="Confirm Password" />
+                    <button type="submit">Sign Up</button>
+                </form>
+
+            </div>
+
+
+            <div class="my-form-container  my-sign-up-containerMobile" id="signupM">
+                <form action="/signup_accountCamp" method="POST" id="first">
+                    <h1>Create Account</h1>
+                    <!-- <div class="my-social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div> -->
+                    <span>or use your email for registration</span>
+                    <input name="companyname" type="text" placeholder="Name" />
+                    <input name="companyemail" type="email" placeholder="Email" />
+                    <input name="companypassword" type="password" placeholder="Password" />
+                    <button type="submit">Sign Up</button>
+                    <a id="loginLink">Login?</a>
+                </form>
+
+            </div>
+
+            <div class="my-form-container my-sign-in-container" id="signin">
+                <form action="/loginCamp" method="POST">
+                    <h1>Sign in</h1>
+                    <!-- <div class="my-social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div> -->
+                    <span>or use your account</span>
+                    <input name="companyemail" type="email" placeholder="Email" />
+                    <input name="companypassword" type="password" placeholder="Password" />
+                    <a href="#">Forgot your password?</a>
+                    <button type="submit">Sign In</button>
+
+                </form>
+            </div>
+
+
+            <div class="my-form-container my-sign-in-containerMobile" id="signinM">
+                <form action="/loginCamp" method="POST">
+                    <h1>Sign in</h1>
+                    <!-- <div class="my-social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div> -->
+                    <span>or use your account</span>
+                    <input name="companyemail" type="email" placeholder="Email" />
+                    <input name="companypassword" type="password" placeholder="Password" />
+                    <a href="#">Forgot your password?</a>
+                    <button type="submit">Sign In</button>
+                    <a id="signupLink">Sign up?</a>
+                </form>
+
+
+            </div>
+            <div class="my-overlay-container">
+                <div class="my-overlay" id="over">
+                    <div class="my-overlay-panel my-overlay-left">
+                        <h1>Welcome Back!</h1>
+                        <p>To keep connected with us please login with your personal info</p>
+                        <button class="my-ghost" id="signIn">Sign In</button>
+                    </div>
+                    <div class="my-overlay-panel my-overlay-right" id="king">
+                        <h1>Hello, User!</h1>
+                        <p id="s"></p>
+                        <button class="my-ghost" id="signUp">Sign Up</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-info">
+        <p>
+            Created with <i class="fa fa-heart"></i> by
+            <a target="_blank" href="https://florin-pop.com">Florin Pop</a> - Read how I created this and how you can join the challenge
+            <a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
+        </p>
+    </footer>
+
+    <script src="../assets/bootstrap/js/index.js"></script>
+
+
+
+</body>
+
+</html>

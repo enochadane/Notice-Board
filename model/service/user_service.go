@@ -1,20 +1,23 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/motikingo/Notice-Board/entity"
+	"github.com/motikingo/Notice-Board/model"
 )
 
+// UserServiceImpl ...
 type UserServiceImpl struct {
 	userRepo model.UserRepository
 }
 
+// NewUserServiceImpl ...
 func NewUserServiceImpl(UserRepos model.UserRepository) *UserServiceImpl {
 	return &UserServiceImpl{userRepo: UserRepos}
 }
 
-func (us *UserServiceImpl) Users() ([]entity.User, error)  {
-	
+// Users ...
+func (us *UserServiceImpl) Users() ([]entity.User, error) {
+
 	users, err := us.userRepo.Users()
 
 	if err != nil {
@@ -24,8 +27,9 @@ func (us *UserServiceImpl) Users() ([]entity.User, error)  {
 	return users, nil
 }
 
+// StoreUser ...
 func (us *UserServiceImpl) StoreUser(user entity.User) error {
-	
+
 	err := us.userRepo.StoreUser(user)
 
 	if err != nil {
@@ -35,6 +39,7 @@ func (us *UserServiceImpl) StoreUser(user entity.User) error {
 	return nil
 }
 
+// User ...
 func (us *UserServiceImpl) User(id int) (entity.User, error) {
 
 	u, err := us.userRepo.User(id)
@@ -46,8 +51,9 @@ func (us *UserServiceImpl) User(id int) (entity.User, error) {
 	return u, nil
 }
 
+// UpdateUser ...
 func (us *UserServiceImpl) UpdateUser(user entity.User) error {
-	
+
 	err := us.userRepo.UpdateUser(user)
 
 	if err != nil {
@@ -57,8 +63,9 @@ func (us *UserServiceImpl) UpdateUser(user entity.User) error {
 	return nil
 }
 
+// DeleteUser ...
 func (us *UserServiceImpl) DeleteUser(id int) error {
-	
+
 	err := us.userRepo.DeleteUser(id)
 
 	if err != nil {
@@ -67,4 +74,3 @@ func (us *UserServiceImpl) DeleteUser(id int) error {
 
 	return nil
 }
-

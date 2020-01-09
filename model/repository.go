@@ -1,7 +1,8 @@
 package model
 
-import "NoticeBoard/entity"
+import "github.com/motikingo/Notice-Board/entity"
 
+//UserRepository ...
 type UserRepository interface {
 	Users() ([]entity.User, error)
 	User(id int) (entity.User, error)
@@ -10,6 +11,7 @@ type UserRepository interface {
 	StoreUser(user entity.User) error
 }
 
+//CompanyRepository ...
 type CompanyRepository interface {
 	Companies() ([]entity.Company, error)
 	Company(id int) (entity.Company, error)
@@ -18,6 +20,7 @@ type CompanyRepository interface {
 	StoreCompany(company entity.Company) error
 }
 
+// PostRepository ...
 type PostRepository interface {
 	Posts() ([]entity.Post, error)
 	Post(id int) (entity.Post, error)

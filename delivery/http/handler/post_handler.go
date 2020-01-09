@@ -10,19 +10,22 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/motikingo/Notice-Board/entity"
+	"github.com/motikingo/Notice-Board/model"
 )
 
+// CompanyPostHandler ...
 type CompanyPostHandler struct {
-	tmpl	*template.Template
+	tmpl    *template.Template
 	postSrv model.PostService
 }
 
+// NewCompanyPostHandler ...
 func NewCompanyPostHandler(T *template.Template, PS model.PostService) *CompanyPostHandler {
 	return &CompanyPostHandler{tmpl: T, postSrv: PS}
 }
 
+// CompanyPosts ...
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := cph.postSrv.Posts()
 	if err != nil {
@@ -31,6 +34,7 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", posts)
 }
 
+// CompanyPostsNew ...
 func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
@@ -69,6 +73,8 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 }
 
 // AdminCategoriesUpdate handle requests on /admin/categories/update
+
+// CompanyPostsUpdate ...
 func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -121,7 +127,7 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 
 }
 
-// AdminCategoriesDelete handle requests on route /admin/categories/delete
+// CompanyPostsDelete ...
 func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {

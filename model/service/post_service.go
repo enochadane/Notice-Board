@@ -1,20 +1,23 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/motikingo/Notice-Board/entity"
+	"github.com/motikingo/Notice-Board/model"
 )
 
+//PostServiceImpl ...
 type PostServiceImpl struct {
 	postRepo model.PostRepository
 }
 
+// NewPostServiceImpl ...
 func NewPostServiceImpl(PostRepos model.PostRepository) *PostServiceImpl {
 	return &PostServiceImpl{postRepo: PostRepos}
 }
 
-func (ps *PostServiceImpl) Posts() ([]entity.Post, error)  {
-	
+//Posts ...
+func (ps *PostServiceImpl) Posts() ([]entity.Post, error) {
+
 	posts, err := ps.postRepo.Posts()
 
 	if err != nil {
@@ -24,8 +27,9 @@ func (ps *PostServiceImpl) Posts() ([]entity.Post, error)  {
 	return posts, nil
 }
 
+// StorePost ...
 func (ps *PostServiceImpl) StorePost(post entity.Post) error {
-	
+
 	err := ps.postRepo.StorePost(post)
 
 	if err != nil {
@@ -35,6 +39,7 @@ func (ps *PostServiceImpl) StorePost(post entity.Post) error {
 	return nil
 }
 
+//Post ...
 func (ps *PostServiceImpl) Post(id int) (entity.Post, error) {
 
 	post, err := ps.postRepo.Post(id)
@@ -46,8 +51,9 @@ func (ps *PostServiceImpl) Post(id int) (entity.Post, error) {
 	return post, nil
 }
 
+//UpdatePost ...
 func (ps *PostServiceImpl) UpdatePost(post entity.Post) error {
-	
+
 	err := ps.postRepo.UpdatePost(post)
 
 	if err != nil {
@@ -57,8 +63,9 @@ func (ps *PostServiceImpl) UpdatePost(post entity.Post) error {
 	return nil
 }
 
+// DeletePost ...
 func (ps *PostServiceImpl) DeletePost(id int) error {
-	
+
 	err := ps.postRepo.DeletePost(id)
 
 	if err != nil {
@@ -67,4 +74,3 @@ func (ps *PostServiceImpl) DeletePost(id int) error {
 
 	return nil
 }
-

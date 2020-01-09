@@ -4,19 +4,22 @@ import (
 	"database/sql"
 	"errors"
 
-	"NoticeBoard/entity"
+	"github.com/motikingo/Notice-Board/entity"
 )
 
+//PostRepositoryImpl ...
 type PostRepositoryImpl struct {
 	conn *sql.DB
 }
 
+//NewPostRepositoryImpl ...
 func NewPostRepositoryImpl(Conn *sql.DB) *PostRepositoryImpl {
 	return &PostRepositoryImpl{conn: Conn}
 }
 
+// Posts ...
 func (pri *PostRepositoryImpl) Posts() ([]entity.Post, error) {
-	
+
 	rows, err := pri.conn.Query("SELECT * FROM posts;")
 	if err != nil {
 		return nil, errors.New("could not query the database")
@@ -33,13 +36,14 @@ func (pri *PostRepositoryImpl) Posts() ([]entity.Post, error) {
 		}
 		posts = append(posts, post)
 	}
-	
+
 	return posts, nil
 
 }
 
+// Post ...
 func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
-	
+
 	row := pri.conn.QueryRow("SELECT * FROM posts WHERE id = $1", id)
 
 	post := entity.Post{}
@@ -53,8 +57,9 @@ func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
 
 }
 
+//UpdatePost ...
 func (pri *PostRepositoryImpl) UpdatePost(post entity.Post) error {
-	
+
 	_, err := pri.conn.Exec("UPDATE posts SET title=$1, description=$2, image=$3, type=$4 WHERE id=$5", post.Title, post.Description, post.Image, post.Type, post.Id)
 	if err != nil {
 		return errors.New("Update has failed")
@@ -63,8 +68,9 @@ func (pri *PostRepositoryImpl) UpdatePost(post entity.Post) error {
 	return nil
 }
 
+// DeletePost ...
 func (pri *PostRepositoryImpl) DeletePost(id int) error {
-	
+
 	_, err := pri.conn.Exec("DELETE FROM posts WHERE id=$1", id)
 	if err != nil {
 		return errors.New("Delete has failed")
@@ -73,8 +79,9 @@ func (pri *PostRepositoryImpl) DeletePost(id int) error {
 	return nil
 }
 
+// StorePost ...
 func (pri *PostRepositoryImpl) StorePost(post entity.Post) error {
-	
+
 	_, err := pri.conn.Exec("INSERT INTO posts (title,description,image,type) values($1, $2, $3, $4)", post.Title, post.Description, post.Image, post.Type)
 	if err != nil {
 		return errors.New("Insertion has failed")
