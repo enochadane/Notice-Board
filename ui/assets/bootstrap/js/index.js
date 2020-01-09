@@ -3,71 +3,73 @@ const signInButton = document.getElementById('signIn');
 const container = document.getElementById('container');
 const linklogIn = document.getElementById('loginLink');
 const linkSignUp = document.getElementById('signupLink');
- a = false;
+a = false;
 
 
 
 
 
-function controller(x){
-    
+function controller(x) {
+
     var container = document.getElementById('container');
 
     if (x.matches) {
 
-    	container.classList.remove("my-overlay-right");
-        document.getElementById("s").innerHTML="king seccussful!!!";
-
-         a = false; 
-         container.classList.add("my-overlay-right");  
-
-         linklogIn.addEventListener('click',() =>{
-         	$("#signinM").show();
-         	$("#signupM").hide();
-
-         });
+        container.classList.remove("my-overlay-right");
 
 
-         linkSignUp.addEventListener('click',() =>{
-         	$("#signinM").hide();
-         	$("#signupM").show();
-         });
+        a = false;
+        container.classList.add("my-overlay-right");
+
+        linklogIn.addEventListener('click', () => {
+            $("#signinM").show();
+            $("#signupM").hide();
+
+        });
+
+
+        linkSignUp.addEventListener('click', () => {
+            $("#signinM").hide();
+            $("#signupM").show();
+        });
 
         $("#signin").hide();
         $("#signup").hide();
         $("#signupM").show();
         $("#over").hide();
+        $("#abcd").show();
+        $("#abc").hide();
 
 
-       
-		
-    }
-   
-    else{
 
-    	$("#signinM").hide();
 
-    	$("#signin").show();
+    } else {
+        $("#abcd").hide();
+        $("#abc").show();
+
+        $("#signinM").hide();
+
+        $("#signin").show();
 
         $("#over").show();
-    	document.getElementById("s").innerHTML="king !!!";
-    	   	 
-    	 a = true;
-    	
+
+
+        a = true;
+
         signUpButton.addEventListener('click', () => {
-			if (a) {
-				container.classList.add("right-panel-active");
-			}
-			
-		});
+            if (a) {
+                container.classList.add("right-panel-active");
+            }
 
-		signInButton.addEventListener('click', () => {
+        });
 
-			if (a) {
-				container.classList.remove("right-panel-active");
-			}
-			
-		});		
+        signInButton.addEventListener('click', () => {
+
+            if (a) {
+                container.classList.remove("right-panel-active");
+            }
+
+        });
     }
 }
 
@@ -75,5 +77,3 @@ function controller(x){
 var b = window.matchMedia("(max-width:500px)")
 controller(b)
 b.addListener(controller)
-
-
