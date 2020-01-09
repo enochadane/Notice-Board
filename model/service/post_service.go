@@ -13,8 +13,8 @@ func NewPostServiceImpl(PostRepos model.PostRepository) *PostServiceImpl {
 	return &PostServiceImpl{postRepo: PostRepos}
 }
 
-func (ps *PostServiceImpl) Posts() ([]entity.Post, error)  {
-	
+func (ps *PostServiceImpl) Posts() ([]entity.Post, error) {
+
 	posts, err := ps.postRepo.Posts()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func (ps *PostServiceImpl) Posts() ([]entity.Post, error)  {
 }
 
 func (ps *PostServiceImpl) StorePost(post entity.Post) error {
-	
+
 	err := ps.postRepo.StorePost(post)
 
 	if err != nil {
@@ -47,7 +47,7 @@ func (ps *PostServiceImpl) Post(id int) (entity.Post, error) {
 }
 
 func (ps *PostServiceImpl) UpdatePost(post entity.Post) error {
-	
+
 	err := ps.postRepo.UpdatePost(post)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (ps *PostServiceImpl) UpdatePost(post entity.Post) error {
 }
 
 func (ps *PostServiceImpl) DeletePost(id int) error {
-	
+
 	err := ps.postRepo.DeletePost(id)
 
 	if err != nil {
@@ -67,4 +67,3 @@ func (ps *PostServiceImpl) DeletePost(id int) error {
 
 	return nil
 }
-

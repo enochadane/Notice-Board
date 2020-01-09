@@ -1,0 +1,10 @@
+{{ define "cmp_profile.layout" }}
+
+{{ template "cmp_profile.content" . }}
+{{ template "footer" . }}
+
+{{ end }}
+
+
+
+

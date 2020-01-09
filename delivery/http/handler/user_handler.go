@@ -10,7 +10,7 @@ import (
 )
 
 type UserHandler struct {
-	tmpl	*template.Template
+	tmpl          *template.Teplte
 	userSrv model.UserService
 	postSrv model.PostService
 }
@@ -34,14 +34,14 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("userpassword")
 
 		users, _ := uh.userSrv.Users()
-		
+
 		for _, user := range users {
 			fmt.Println(users)
 			if email == user.Email && password == user.Password {
 				fmt.Println("authentication successfull! ")
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
 				break
-			
+
 			} else {
 				fmt.Println("No such user!")
 			}
@@ -52,9 +52,9 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method == http.MethodPost {
-		
+
 		usr := entity.User{}
 		usr.Name = r.FormValue("username")
 		usr.Email = r.FormValue("useremail")
@@ -64,7 +64,7 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		users, _ := uh.userSrv.Users()
 
 		for _, user := range users {
-			
+
 			if usr.Email == user.Email {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 				fmt.Println("This Email is already in use! ")
@@ -74,25 +74,25 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 		// if usr.Password == confirmpass {
 
-			err := uh.userSrv.StoreUser(usr)
+	err := uh.userSrv.StoreUser(usr)
 
-			if err != nil {
-				panic(err)
-			}
+		f err != nil {
+			anic(err)
+		
 
-			fmt.Println(users)
+	fmt.Println(users)
 
-			fmt.Println(usr)
+	fmt.Println(usr)
 
-			fmt.Println("User added to db")
+	fmt.Println("User added to db")
 
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		ttp.Redirect(w, r, "/home", http.StatusSeeOther)
 
 		// } else {
 		// 	http.Redirect(w, r, "/signup", http.StatusSeeOther)
 		// 	fmt.Println("Password doesn't match! ")
 		// }
-		
+
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
@@ -103,3 +103,9 @@ func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 	posts, _ := uh.postSrv.Posts()
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
 }
+
+
+
+
+
+

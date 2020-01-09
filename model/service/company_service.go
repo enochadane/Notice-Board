@@ -13,8 +13,8 @@ func NewCompanyServiceImpl(CompanyRepos model.CompanyRepository) *CompanyService
 	return &CompanyServiceImpl{companyRepo: CompanyRepos}
 }
 
-func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error)  {
-	
+func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error) 
+
 	companies, err := cs.companyRepo.Companies()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error)  {
 }
 
 func (cs *CompanyServiceImpl) StoreCompany(company entity.Company) error {
-	
+
 	err := cs.companyRepo.StoreCompany(company)
 
 	if err != nil {
@@ -47,7 +47,7 @@ func (cs *CompanyServiceImpl) Company(id int) (entity.Company, error) {
 }
 
 func (cs *CompanyServiceImpl) UpdateCompany(company entity.Company) error {
-	
+
 	err := cs.companyRepo.UpdateCompany(company)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (cs *CompanyServiceImpl) UpdateCompany(company entity.Company) error {
 }
 
 func (cs *CompanyServiceImpl) DeleteCompany(id int) error {
-	
+
 	err := cs.companyRepo.DeleteCompany(id)
 
 	if err != nil {
@@ -67,4 +67,3 @@ func (cs *CompanyServiceImpl) DeleteCompany(id int) error {
 
 	return nil
 }
-

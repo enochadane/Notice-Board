@@ -13,8 +13,8 @@ func NewUserServiceImpl(UserRepos model.UserRepository) *UserServiceImpl {
 	return &UserServiceImpl{userRepo: UserRepos}
 }
 
-func (us *UserServiceImpl) Users() ([]entity.User, error)  {
-	
+func (us *UserServiceImpl) Users() ([]entity.User, error)  
+
 	users, err := us.userRepo.Users()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func (us *UserServiceImpl) Users() ([]entity.User, error)  {
 }
 
 func (us *UserServiceImpl) StoreUser(user entity.User) error {
-	
+
 	err := us.userRepo.StoreUser(user)
 
 	if err != nil {
@@ -47,7 +47,7 @@ func (us *UserServiceImpl) User(id int) (entity.User, error) {
 }
 
 func (us *UserServiceImpl) UpdateUser(user entity.User) error {
-	
+
 	err := us.userRepo.UpdateUser(user)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (us *UserServiceImpl) UpdateUser(user entity.User) error {
 }
 
 func (us *UserServiceImpl) DeleteUser(id int) error {
-	
+
 	err := us.userRepo.DeleteUser(id)
 
 	if err != nil {
@@ -67,4 +67,3 @@ func (us *UserServiceImpl) DeleteUser(id int) error {
 
 	return nil
 }
-

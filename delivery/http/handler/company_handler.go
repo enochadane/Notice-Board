@@ -10,9 +10,9 @@ import (
 )
 
 type CompanyHandler struct {
-	tmpl		*template.Template
-	companySrv 	model.CompanyService
-	postSrv		model.PostService
+	tmpl       *template.Template
+	companySrv model.CompanyService
+	postSrv    model.PostService
 }
 
 func NewCompanyHandler(T *template.Template, CS model.CompanyService, PS model.PostService) *CompanyHandler {
@@ -41,13 +41,13 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		for _, cmp := range companies {
 			if cmp.Email == email && cmp.Password == password {
 				fmt.Println("authentication successfull! ")
 				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 				break
-			
+
 			} else {
 				fmt.Println("No such Company!")
 			}
@@ -58,9 +58,9 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method == http.MethodPost {
-		
+
 		cmp := entity.Company{}
 		cmp.Name = r.FormValue("companyname")
 		cmp.Email = r.FormValue("companyemail")
@@ -70,7 +70,7 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		companies, _ := ch.companySrv.Companies()
 
 		for _, company := range companies {
-			
+
 			if cmp.Email == company.Email {
 				http.Redirect(w, r, "/cmp", http.StatusSeeOther)
 				fmt.Println("This Email is already in use! ")
@@ -92,7 +92,6 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 
-		
 	} else {
 		ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", nil)
 	}
@@ -105,5 +104,5 @@ func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
+	ch.tmpl.ExecuteTemplate(w, "cmp_profile.layout", nil)
 }

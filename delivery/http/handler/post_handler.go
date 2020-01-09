@@ -37,7 +37,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	fmt.Println("companypostsnew function invoked! ")
 
 	if r.Method == http.MethodPost {
-		
+
 		idRaw := r.URL.Query().Get("id")
 
 		id, err := strconv.Atoi(idRaw)
@@ -74,7 +74,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		if err != nil {
 			panic(err)
 		}
-		
+
 		fmt.Println(post)
 		fmt.Println("post added to db")
 
