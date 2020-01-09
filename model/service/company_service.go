@@ -1,70 +1,111 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
-type CompanyServiceImpl struct {
+// CompanyService implements model.CompanyRepository interface
+type CompanyService struct {
 	companyRepo model.CompanyRepository
 }
 
-func NewCompanyServiceImpl(CompanyRepos model.CompanyRepository) *CompanyServiceImpl {
-	return &CompanyServiceImpl{companyRepo: CompanyRepos}
+// NewCompanyService will create new CompanyService object
+func NewCompanyService(CompanyRepos model.CompanyRepository) model.CompanyService {
+	return &CompanyService{companyRepo: CompanyRepos}
 }
 
-func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error)  {
+// Companies returns list of companies
+func (cs *CompanyService) Companies() ([]entity.Company, []error)  {
 	
-	companies, err := cs.companyRepo.Companies()
+	companies, errs := cs.companyRepo.Companies()
 
-	if err != nil {
-		return nil, err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
 	return companies, nil
 }
 
-func (cs *CompanyServiceImpl) StoreCompany(company entity.Company) error {
+// StoreCompany persists new company information
+func (cs *CompanyService) StoreCompany(company *entity.Company) (*entity.Company, []error) {
 	
-	err := cs.companyRepo.StoreCompany(company)
+	cmp, errs := cs.companyRepo.StoreCompany(company)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return cmp, nil
 }
 
-func (cs *CompanyServiceImpl) Company(id int) (entity.Company, error) {
+// Company returns a company object with a given id
+func (cs *CompanyService) Company(id uint) (*entity.Company, []error) {
 
-	c, err := cs.companyRepo.Company(id)
+	cmp, errs := cs.companyRepo.Company(id)
 
-	if err != nil {
-		return c, err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return c, nil
+	return cmp, nil
 }
 
-func (cs *CompanyServiceImpl) UpdateCompany(company entity.Company) error {
+// UpdateCompany updates a company with new data
+func (cs *CompanyService) UpdateCompany(company *entity.Company) (*entity.Company, []error) {
 	
-	err := cs.companyRepo.UpdateCompany(company)
+	cmp, errs := cs.companyRepo.UpdateCompany(company)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return cmp, nil
 }
 
-func (cs *CompanyServiceImpl) DeleteCompany(id int) error {
+// DeleteCompany delete a company by its id
+func (cs *CompanyService) DeleteCompany(id uint) (*entity.Company, []error) {
 	
-	err := cs.companyRepo.DeleteCompany(id)
+	cmp, errs := cs.companyRepo.DeleteCompany(id)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return cmp, nil
+}
+
+// StoreSession persists new session information
+func (cs *CompanyService) StoreSession(session *entity.Session) (*entity.Session, []error) {
+	
+	s, errs := cs.companyRepo.StoreSession(session)
+
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return s, nil
+}
+
+// DeleteSession delete a session by its id
+func (cs *CompanyService) DeleteSession(uuid string) (*entity.Session, []error) {
+	
+	s, errs := cs.companyRepo.DeleteSession(uuid)
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return s, nil
+}
+
+// Session returns a session object with a given id
+func (cs *CompanyService) Session(uuid string) (*entity.Session, []error) {
+
+	s, errs := cs.companyRepo.Session(uuid)
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	return s, nil
 }
 

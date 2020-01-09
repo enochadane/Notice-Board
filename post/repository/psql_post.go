@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"NoticeBoard/entity"
+	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 type PostRepositoryImpl struct {
@@ -27,7 +27,7 @@ func (pri *PostRepositoryImpl) Posts() ([]entity.Post, error) {
 
 	for rows.Next() {
 		post := entity.Post{}
-		err := rows.Scan(&post.Id, &post.CompanyId, &post.Title, &post.Description, &post.Image, &post.Category)
+		err := rows.Scan(&post.ID, &post.Title, &post.Description, &post.Image, &post.Category)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
 
 	post := entity.Post{}
 
-	err := row.Scan(&post.Id, &post.CompanyId, &post.Title, &post.Description, &post.Image, &post.Category)
+	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Image, &post.Category)
 	if err != nil {
 		return post, err
 	}
@@ -75,7 +75,7 @@ func (pri *PostRepositoryImpl) DeletePost(id int) error {
 
 func (pri *PostRepositoryImpl) StorePost(post entity.Post) error {
 	
-	_, err := pri.conn.Exec("INSERT INTO posts (company_id,title,description,image,category) values($1, $2, $3,$4,$5)", post.CompanyId, post.Title, post.Description, post.Image, post.Category)
+	_, err := pri.conn.Exec("INSERT INTO posts (title,description,image,category) values($1, $2, $3,$4)", post.Title, post.Description, post.Image, post.Category)
 	if err != nil {
 		return errors.New("Insertion has failed")
 	}

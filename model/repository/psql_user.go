@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"NoticeBoard/entity"
+	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 type UserRepositoryImpl struct {
@@ -27,7 +27,7 @@ func (usi *UserRepositoryImpl) Users() ([]entity.User, error) {
 
 	for rows.Next() {
 		user := entity.User{}
-		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+		err = rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (usi *UserRepositoryImpl) User(id int) (entity.User, error) {
 
 	u := entity.User{}
 
-	err := row.Scan(&u.Id, &u.Name, &u.Email, &u.Password)
+	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.Password)
 	if err != nil {
 		return u, err
 	}
@@ -54,7 +54,7 @@ func (usi *UserRepositoryImpl) User(id int) (entity.User, error) {
 
 func (usi *UserRepositoryImpl) UpdateUser(u entity.User) error {
 	
-	_, err := usi.conn.Exec("UPDATE users SET name=$1,email=$2, password=$3 WHERE id=$4", u.Name, u.Email, u.Password, u.Id)
+	_, err := usi.conn.Exec("UPDATE users SET name=$1,email=$2, password=$3 WHERE id=$4", u.Name, u.Email, u.Password, u.ID)
 	if err != nil {
 		return errors.New("Update has failed")
 	}

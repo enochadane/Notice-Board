@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
 
-	"NoticeBoard/model/repository"
-	"NoticeBoard/model/service"
-	"NoticeBoard/delivery/http/handler"
+	"github.com/amthesonofGod/Notice-Board/entity"
+
+	"github.com/amthesonofGod/Notice-Board/model/repository"
+	"github.com/amthesonofGod/Notice-Board/model/service"
+
+	postRepos "github.com/amthesonofGod/Notice-Board/post/repository"
+	postServ "github.com/amthesonofGod/Notice-Board/post/service"
+
+	"github.com/amthesonofGod/Notice-Board/delivery/http/handler"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 const (
@@ -27,45 +35,64 @@ func init() {
 	tmpl = template.Must(template.ParseGlob("../../ui/templates/*"))
 }
 
+func createTables(dbconn *gorm.DB) []error {
+
+	// dbconn.DropTableIfExists(&entity.Session{})
+	errs := dbconn.CreateTable(&entity.Post{}, &entity.Session{}, &entity.User{}, &entity.Company{}).GetErrors()
+
+	if errs != nil {
+		return errs
+	}
+
+	return nil
+}
+
 func main()  {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
     "password=%s dbname=%s sslmode=disable",
 	host, port, user, password, dbname)
 
-	dbconn, err := sql.Open("postgres", psqlInfo)
+	dbconn, err := gorm.Open("postgres", psqlInfo)
 
 	if err != nil {
 		panic(err)
 	}
 
-	defer dbconn.Close()
-
-	if err := dbconn.Ping(); err != nil {
-		panic(err)
-	}
-
 	fmt.Println("DB connection established")
 
-	// tmpl := template.Must(template.ParseGlob("../../ui/templates/*"))
+	defer dbconn.Close()
 
+	createTables(dbconn)
 
-	companyRepo := repository.NewCompanyRepositoryImpl(dbconn)
-	companySrv := service.NewCompanyServiceImpl(companyRepo)
+	// if err := dbconn.Ping(); err != nil {
+	// 	panic(err)
+	// }
 
-	postRepo := repository.NewPostRepositoryImpl(dbconn)
-	postSrv := service.NewPostServiceImpl(postRepo)
+	companyRepo := repository.NewCompanyGormRepo(dbconn)
+	companySrv := service.NewCompanyService(companyRepo)
 
-	userRepo := repository.NewUserRepositoryImpl(dbconn)
-	userSrv := service.NewUserServiceImpl(userRepo)
+	postRepo := postRepos.NewPostGormRepo(dbconn)
+	postSrv := postServ.NewPostService(postRepo)
+
+	userRepo := repository.NewUserGormRepo(dbconn)
+	userSrv := service.NewUserService(userRepo)
 
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
-
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv)
 
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv)
 
-	// mux := http.NewServeMux()
+
+
+	// dbconn.Model(company).Find(company)
+	// for _, p := range postSrv.Posts {
+	// 	dbconn.Model(company).Association("Posts").Append(p)
+	// }
+
+
+
+
 	r := mux.NewRouter()
 	
 	// Server CSS, JS & Images Statically.
@@ -74,36 +101,22 @@ func main()  {
 
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
 	
-	r.HandleFunc("/", Index)
-	
-	// r.HandleFunc("/signin", usrHandler.Signin)
-	// r.HandleFunc("/signup", usrHandler.Signup)
+	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
 	r.HandleFunc("/signup_account", usrHandler.CreateAccount)
 	r.HandleFunc("/home", usrHandler.Home)
 	
-	// r.HandleFunc("/cmp-signin", cmpHandler.Signin)
-	// r.HandleFunc("/cmp-signup", cmpHandler.Signup)
 	r.HandleFunc("/cmp", cmpHandler.SignInUp)
 	r.HandleFunc("/cmp-login", cmpHandler.Login)
 	r.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
 	r.HandleFunc("/cmp-home", cmpHandler.Home)
-	r.HandleFunc("/admin", cmpHandler.Admin)
 	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
 
-	r.HandleFunc("/admin/post-job", postHandler.CompanyPostsNew)
+	r.HandleFunc("/admin", cmpHandler.Admin)
+	r.HandleFunc("/admin/posts/new", postHandler.CompanyPostsNew)
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
 
 	http.ListenAndServe(":8080", r)
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
 
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-	tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
-
-}

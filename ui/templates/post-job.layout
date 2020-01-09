@@ -1,7 +1,5 @@
 {{ define "post-job.layout"}}
-
-{{ template "navbar" . }}
+{{ template "cmp_navbar" . }}
 {{ template "post-job.content" . }}
 {{ template "footer" . }}
-
 {{ end }}
