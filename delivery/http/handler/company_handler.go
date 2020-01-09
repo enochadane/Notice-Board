@@ -138,20 +138,16 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 // Home handle requests on /cmp-home
 func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
+
+	// get cookie
+	_, err := r.Cookie("session")
+	if err != nil {
+		fmt.Println("no cookie")
+		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
+		return
+	}
+
 	posts, _ := ch.postSrv.Posts()
-	// for _, post := range posts {
-	// 	cmp, _ := ch.companySrv.Company(post.CompanyID)
-	// 	// if len(err) > 0 {
-	// 	// 	panic(err)
-	// 	// }
-
-	// 	m = make(map[entity.Post]string)
-	// 	m[post] = cmp.Name
-	// 	// fmt.Println(m[post])
-
-	// 	// fmt.Println(cmp.Name)
-
-	// }
 	
 	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", posts)
 }

@@ -1,0 +1,7 @@
+{{ define "request_list.layout" }}
+
+{{ template "no_jumb_navbar" . }}
+{{ template "request_list.content" . }}
+{{ template "footer" . }}
+
+{{ end }}

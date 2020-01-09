@@ -45,9 +45,9 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 
 	authorizedPost := []entity.Post{}
 	
-	posts, err := cph.postSrv.Posts()
-	if err != nil {
-		panic(err)
+	posts, errs := cph.postSrv.Posts()
+	if len(errs) > 0 {
+		panic(errs)
 	}
 	for _, post := range posts {
 		if s.CompanyID == post.CompanyID {
@@ -71,7 +71,6 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	if r.Method == http.MethodPost {
 
 		fmt.Println("post method verified! ")
-
 
 		var cookie, err = r.Cookie("session")
 		if err == nil {

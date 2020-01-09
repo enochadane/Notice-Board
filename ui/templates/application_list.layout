@@ -1,0 +1,7 @@
+{{ define "application_list.layout" }}
+
+{{ template "no_jumb_navbar" . }}
+{{ template "application_list.content" . }}
+{{ template "footer" .}}
+
+{{ end }}

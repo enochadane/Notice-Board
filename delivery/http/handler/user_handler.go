@@ -10,16 +10,19 @@ import (
 	"github.com/amthesonofGod/Notice-Board/post"
 )
 
+// UserHandler handles user requests
 type UserHandler struct {
 	tmpl	*template.Template
 	userSrv model.UserService
 	postSrv post.PostService
 }
 
+// NewUserHandler initializes and returns new NewUserHandler
 func NewUserHandler(T *template.Template, US model.UserService, PS post.PostService) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
 }
 
+// Index handle requests on /
 func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
@@ -31,6 +34,7 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Login handle requests on /login
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 
@@ -55,6 +59,7 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	
 	if r.Method == http.MethodPost {
@@ -103,6 +108,7 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Home handle requests on /home
 func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 	posts, _ := uh.postSrv.Posts()
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
