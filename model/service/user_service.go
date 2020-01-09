@@ -1,70 +1,77 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
-type UserServiceImpl struct {
+// UserService implements model.UserRepository interface
+type UserService struct {
 	userRepo model.UserRepository
 }
 
-func NewUserServiceImpl(UserRepos model.UserRepository) *UserServiceImpl {
-	return &UserServiceImpl{userRepo: UserRepos}
+// NewUserService will create new UserService object
+func NewUserService(UserRepos model.UserRepository) model.UserService {
+	return &UserService{userRepo: UserRepos}
 }
 
-func (us *UserServiceImpl) Users() ([]entity.User, error)  {
+// Users returns list of users
+func (us *UserService) Users() ([]entity.User, []error)  {
 	
-	users, err := us.userRepo.Users()
+	users, errs := us.userRepo.Users()
 
-	if err != nil {
-		return nil, err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
 	return users, nil
 }
 
-func (us *UserServiceImpl) StoreUser(user entity.User) error {
+// StoreUser persists new user information
+func (us *UserService) StoreUser(user *entity.User) (*entity.User, []error) {
 	
-	err := us.userRepo.StoreUser(user)
+	usr, errs := us.userRepo.StoreUser(user)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return usr, nil
 }
 
-func (us *UserServiceImpl) User(id int) (entity.User, error) {
+// User returns a user object with a given id
+func (us *UserService) User(id uint) (*entity.User, []error) {
 
-	u, err := us.userRepo.User(id)
+	user, errs := us.userRepo.User(id)
 
-	if err != nil {
-		return u, err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return u, nil
+	return user, nil
 }
 
-func (us *UserServiceImpl) UpdateUser(user entity.User) error {
+// UpdateUser updates a user with new data
+func (us *UserService) UpdateUser(user *entity.User) (*entity.User, []error) {
 	
-	err := us.userRepo.UpdateUser(user)
+	usr, errs := us.userRepo.UpdateUser(user)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return usr, nil
 }
 
-func (us *UserServiceImpl) DeleteUser(id int) error {
+// DeleteUser deletes a user by its id
+func (us *UserService) DeleteUser(id uint) (*entity.User, []error) {
 	
-	err := us.userRepo.DeleteUser(id)
+	usr, errs := us.userRepo.DeleteUser(id)
 
-	if err != nil {
-		return err
+	if len(errs) > 0 {
+		return nil, errs
 	}
 
-	return nil
+	return usr, nil
 }
 

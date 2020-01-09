@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	
-	"NoticeBoard/entity"
+	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 type CompanyRepositoryImpl struct {
@@ -27,7 +27,7 @@ func (ci *CompanyRepositoryImpl) Companies() ([]entity.Company, error) {
 
 	for rows.Next() {
 		cmp := entity.Company{}
-		err = rows.Scan(&cmp.Id, &cmp.Name, &cmp.Email, &cmp.Password)
+		err = rows.Scan(&cmp.ID, &cmp.Name, &cmp.Email, &cmp.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (ci *CompanyRepositoryImpl) Company(id int) (entity.Company, error) {
 
 	c := entity.Company{}
 
-	err := row.Scan(&c.Id, &c.Name, &c.Email, &c.Password)
+	err := row.Scan(&c.ID, &c.Name, &c.Email, &c.Password)
 	if err != nil {
 		return c, err
 	}
@@ -54,7 +54,7 @@ func (ci *CompanyRepositoryImpl) Company(id int) (entity.Company, error) {
 
 func (ci *CompanyRepositoryImpl) UpdateCompany(c entity.Company) error {
 	
-	_, err := ci.conn.Exec("UPDATE companies SET name=$1,email=$2, password=$3 WHERE id=$4", c.Name, c.Email, c.Password, c.Id)
+	_, err := ci.conn.Exec("UPDATE companies SET name=$1,email=$2, password=$3 WHERE id=$4", c.Name, c.Email, c.Password, c.ID)
 	if err != nil {
 		return errors.New("Update has failed")
 	}

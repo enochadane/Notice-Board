@@ -1,0 +1,5 @@
+{{ define "user_application.layout" }}
+{{ template "navbar" . }}
+{{ template "user_application.content" . }}
+{{ template "footer" . }}
+{{ end }}

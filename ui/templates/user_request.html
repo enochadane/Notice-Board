@@ -1,0 +1,37 @@
+{{ define "user_request.content" }}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h3>Please fill the required information</h3>
+    </div>
+    <div class="container">
+        <form action="/event/join"  method="POST" enctype="multipart/form-data">
+            <div class="form-group row">
+                <label for="fullname" class="col-sm-2 col-form-label">Full Name</label>
+                <div class="col-sm-10">
+                    <input type="text" name="fullname" class="form-control" id="fullname" placeholder="Full Name">
+                </div> 
+            </div>
+
+            <div class="form-group row">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+                </div> 
+            </div>
+
+            <div class="form-group row">
+                <label for="phone" class="col-sm-2 col-form-label">Phone Number</label>
+                <div class="col-sm-10">
+                    <input type="number" name="phone" class="form-control" id="phone" placeholder="+251 ">
+                </div> 
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+{{ end }}

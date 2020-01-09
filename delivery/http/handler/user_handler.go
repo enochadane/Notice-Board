@@ -5,27 +5,31 @@ import (
 	"html/template"
 	"net/http"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
+	"github.com/amthesonofGod/Notice-Board/post"
 )
 
 type UserHandler struct {
 	tmpl	*template.Template
 	userSrv model.UserService
-	postSrv model.PostService
+	postSrv post.PostService
 }
 
-func NewUserHandler(T *template.Template, US model.UserService, PS model.PostService) *UserHandler {
+func NewUserHandler(T *template.Template, US model.UserService, PS post.PostService) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
 }
 
-// func (uh *UserHandler) Signin(w http.ResponseWriter, r *http.Request) {
-// 	uh.tmpl.ExecuteTemplate(w, "signin.layout", nil)
-// }
+func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
-// func (uh *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
-// 	uh.tmpl.ExecuteTemplate(w, "signup.layout", nil)
-// }
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
+
+}
 
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -55,7 +59,7 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	
 	if r.Method == http.MethodPost {
 		
-		usr := entity.User{}
+		usr := &entity.User{}
 		usr.Name = r.FormValue("username")
 		usr.Email = r.FormValue("useremail")
 		usr.Password = r.FormValue("userpassword")
@@ -74,10 +78,10 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 		// if usr.Password == confirmpass {
 
-			err := uh.userSrv.StoreUser(usr)
+			_, errs := uh.userSrv.StoreUser(usr)
 
-			if err != nil {
-				panic(err)
+			if len(errs) > 0 {
+				panic(errs)
 			}
 
 			fmt.Println(users)
