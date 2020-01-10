@@ -1,27 +1,25 @@
 package model
 
-import "NoticeBoard/entity"
+import "github.com/amthesonofGod/Notice-Board/entity"
 
+// UserRepository specifies user database operations
 type UserRepository interface {
-	Users() ([]entity.User, error)
-	User(id int) (entity.User, error)
-	UpdateUser(user entity.User) error
-	DeleteUser(id int) error
-	StoreUser(user entity.User) error
+	Users() ([]entity.User, []error)
+	User(id uint) (*entity.User, []error)
+	UpdateUser(user *entity.User) (*entity.User, []error)
+	DeleteUser(id uint) (*entity.User, []error)
+	StoreUser(user *entity.User) (*entity.User, []error)
 }
 
+// CompanyRepository specifies company database operations
 type CompanyRepository interface {
-	Companies() ([]entity.Company, error)
-	Company(id int) (entity.Company, error)
-	UpdateCompany(company entity.Company) error
-	DeleteCompany(id int) error
-	StoreCompany(company entity.Company) error
+	Companies() ([]entity.Company, []error)
+	Company(id uint) (*entity.Company, []error)
+	UpdateCompany(company *entity.Company) (*entity.Company, []error)
+	DeleteCompany(id uint) (*entity.Company, []error)
+	StoreCompany(company *entity.Company) (*entity.Company ,[]error)
+	StoreSession(session *entity.Session) (*entity.Session, []error)
+	Session(uuid string) (*entity.Session, []error)
+	DeleteSession(uuid string) (*entity.Session, []error)
 }
 
-type PostRepository interface {
-	Posts() ([]entity.Post, error)
-	Post(id int) (entity.Post, error)
-	UpdatePost(post entity.Post) error
-	DeletePost(id int) error
-	StorePost(post entity.Post) error
-}

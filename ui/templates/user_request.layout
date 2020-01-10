@@ -1,0 +1,5 @@
+{{ define "user_request.layout" }}
+{{ template "navbar" . }}
+{{ template "user_request.content" . }}
+{{ template "footer" . }}
+{{ end }}

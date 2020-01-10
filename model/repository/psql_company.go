@@ -3,20 +3,23 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	
-	"NoticeBoard/entity"
+
+	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
+//CompanyRepositoryImpl ...
 type CompanyRepositoryImpl struct {
 	conn *sql.DB
 }
 
+// NewCompanyRepositoryImpl ...
 func NewCompanyRepositoryImpl(Conn *sql.DB) *CompanyRepositoryImpl {
 	return &CompanyRepositoryImpl{conn: Conn}
 }
 
+//Companies ...
 func (ci *CompanyRepositoryImpl) Companies() ([]entity.Company, error) {
-	
+
 	rows, err := ci.conn.Query("SELECT * FROM companies;")
 	if err != nil {
 		return nil, errors.New("Could not query the database")
@@ -27,7 +30,7 @@ func (ci *CompanyRepositoryImpl) Companies() ([]entity.Company, error) {
 
 	for rows.Next() {
 		cmp := entity.Company{}
-		err = rows.Scan(&cmp.Id, &cmp.Name, &cmp.Email, &cmp.Password)
+		err = rows.Scan(&cmp.ID, &cmp.Name, &cmp.Email, &cmp.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -38,13 +41,14 @@ func (ci *CompanyRepositoryImpl) Companies() ([]entity.Company, error) {
 
 }
 
+//Company ...
 func (ci *CompanyRepositoryImpl) Company(id int) (entity.Company, error) {
-	
+
 	row := ci.conn.QueryRow("SELECT * FROM companies WHERE id = $1", id)
 
 	c := entity.Company{}
 
-	err := row.Scan(&c.Id, &c.Name, &c.Email, &c.Password)
+	err := row.Scan(&c.ID, &c.Name, &c.Email, &c.Password)
 	if err != nil {
 		return c, err
 	}
@@ -52,9 +56,10 @@ func (ci *CompanyRepositoryImpl) Company(id int) (entity.Company, error) {
 	return c, nil
 }
 
+//UpdateCompany ...
 func (ci *CompanyRepositoryImpl) UpdateCompany(c entity.Company) error {
-	
-	_, err := ci.conn.Exec("UPDATE companies SET name=$1,email=$2, password=$3 WHERE id=$4", c.Name, c.Email, c.Password, c.Id)
+
+	_, err := ci.conn.Exec("UPDATE companies SET name=$1,email=$2, password=$3 WHERE id=$4", c.Name, c.Email, c.Password, c.ID)
 	if err != nil {
 		return errors.New("Update has failed")
 	}
@@ -62,8 +67,9 @@ func (ci *CompanyRepositoryImpl) UpdateCompany(c entity.Company) error {
 	return nil
 }
 
+//DeleteCompany ...
 func (ci *CompanyRepositoryImpl) DeleteCompany(id int) error {
-	
+
 	_, err := ci.conn.Exec("DELETE FROM companies WHERE id=$1", id)
 	if err != nil {
 		return errors.New("Delete has failed")
@@ -72,8 +78,9 @@ func (ci *CompanyRepositoryImpl) DeleteCompany(id int) error {
 	return nil
 }
 
+//StoreCompany ...
 func (ci *CompanyRepositoryImpl) StoreCompany(c entity.Company) error {
-	
+
 	_, err := ci.conn.Exec("INSERT INTO companies (name,email,password) values($1, $2, $3)", c.Name, c.Email, c.Password)
 	if err != nil {
 		return errors.New("Insertion has failed")

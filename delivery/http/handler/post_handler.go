@@ -10,48 +10,92 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
+	"github.com/amthesonofGod/Notice-Board/post"
 )
 
+// CompanyPostHandler handles post handler admin requests
 type CompanyPostHandler struct {
-	tmpl		*template.Template
-	postSrv 	model.PostService
-	companySrv 	model.CompanyService
+	tmpl       *template.Template
+	postSrv    post.PostService
+	companySrv model.CompanyService
 }
 
-func NewCompanyPostHandler(T *template.Template, PS model.PostService, CP model.CompanyService) *CompanyPostHandler {
+// NewCompanyPostHandler initializes and returns new CompanyPostHandler
+func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP model.CompanyService) *CompanyPostHandler {
 	return &CompanyPostHandler{tmpl: T, postSrv: PS, companySrv: CP}
 }
 
+// CompanyPosts handle requests on route /admin/cmp-posts
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
+
+	var cookie, cerr = r.Cookie("session")
+	if cerr == nil {
+		cookievalue := cookie.Value
+		fmt.Println(cookievalue)
+	}
+
+	s, serr := cph.companySrv.Session(cookie.Value)
+	if len(serr) > 0 {
+		panic(serr)
+	}
+
+	authorizedPost := []entity.Post{}
+
 	posts, err := cph.postSrv.Posts()
 	if err != nil {
 		panic(err)
 	}
-	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", posts)
+	for _, post := range posts {
+		if s.CompanyID == post.CompanyID {
+			authorizedPost = append(authorizedPost, post)
+		}
+	}
+
+	fmt.Println("All posts")
+	fmt.Println(posts)
+
+	fmt.Println("Current Post")
+	fmt.Println(authorizedPost)
+	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
 }
 
+// CompanyPostsNew hanlde requests on route /admin/posts/new
 func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("companypostsnew function invoked! ")
 
 	if r.Method == http.MethodPost {
-		
-		idRaw := r.URL.Query().Get("id")
-
-		id, err := strconv.Atoi(idRaw)
-
-		if err != nil {
-			panic(err)
-		}
-
-		// err = cph.companySrv.Company(id)
 
 		fmt.Println("post method verified! ")
 
-		post := entity.Post{}
-		post.CompanyId = id;
+		var cookie, err = r.Cookie("session")
+		if err == nil {
+			cookievalue := cookie.Value
+			fmt.Println(cookievalue)
+		}
+
+		s, serr := cph.companySrv.Session(cookie.Value)
+
+		if len(serr) > 0 {
+			panic(serr)
+		}
+
+		fmt.Println(s.CompanyID)
+
+		cmp, cerr := cph.companySrv.Company(s.CompanyID)
+
+		if len(cerr) > 0 {
+			fmt.Println("i am the error")
+			panic(cerr)
+		}
+
+		fmt.Println(cmp.Name)
+
+		post := &entity.Post{}
+		post.CompanyID = s.CompanyID
+		post.Owner = cmp.Name
 		post.Title = r.FormValue("title")
 		post.Description = r.FormValue("description")
 		post.Category = r.Form.Get("category")
@@ -68,13 +112,13 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 
 		writeFile(&mf, fh.Filename)
 
-		err = cph.postSrv.StorePost(post)
+		_, errs := cph.postSrv.StorePost(post)
 		// cph.postSrv.StorePost(post)
 
-		if err != nil {
-			panic(err)
+		if len(errs) > 0 {
+			panic(errs)
 		}
-		
+		// fmt.Println(entity.Company.ID)
 		fmt.Println(post)
 		fmt.Println("post added to db")
 
@@ -87,7 +131,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	}
 }
 
-// AdminCategoriesUpdate handle requests on /admin/categories/update
+// CompanyPostsUpdate handle requests on /admin/posts/update
 func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -99,10 +143,10 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 			panic(err)
 		}
 
-		post, err := cph.postSrv.Post(id)
+		post, errs := cph.postSrv.Post(uint(id))
 
-		if err != nil {
-			panic(err)
+		if len(errs) > 0 {
+			panic(errs)
 		}
 
 		cph.tmpl.ExecuteTemplate(w, "admin.categ.update.layout", post)
@@ -110,7 +154,7 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 	} else if r.Method == http.MethodPost {
 
 		pst := entity.Post{}
-		pst.Id, _ = strconv.Atoi(r.FormValue("id"))
+		// pst.ID, _ = strconv.Atoi(r.FormValue("id"))
 		pst.Title = r.FormValue("name")
 		pst.Description = r.FormValue("description")
 		// pst.Image = r.FormValue("image")
@@ -140,7 +184,7 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 
 }
 
-// AdminCategoriesDelete handle requests on route /admin/categories/delete
+// CompanyPostsDelete handle requests on route /admin/posts/delete
 func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -153,10 +197,10 @@ func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http
 			panic(err)
 		}
 
-		err = cph.postSrv.DeletePost(id)
+		_, errs := cph.postSrv.DeletePost(uint(id))
 
-		if err != nil {
-			panic(err)
+		if len(errs) > 0 {
+			panic(errs)
 		}
 
 	}
