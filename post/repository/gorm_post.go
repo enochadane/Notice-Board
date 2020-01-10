@@ -17,7 +17,7 @@ func NewPostGormRepo(db *gorm.DB) post.PostRepository {
 }
 
 // Posts returns all posts stored in the database
-func (pRepo *PostGormRepo) Posts() ([]entity.Post, []error)  {
+func (pRepo *PostGormRepo) Posts() ([]entity.Post, []error) {
 	posts := []entity.Post{}
 	errs := pRepo.conn.Find(&posts).GetErrors()
 	if len(errs) > 0 {
@@ -29,7 +29,6 @@ func (pRepo *PostGormRepo) Posts() ([]entity.Post, []error)  {
 
 // Post retrieve a post from the database by its id
 func (pRepo *PostGormRepo) Post(id uint) (*entity.Post, []error) {
-	
 	post := entity.Post{}
 	errs := pRepo.conn.First(&post, id).GetErrors()
 	if len(errs) > 0 {
@@ -40,7 +39,6 @@ func (pRepo *PostGormRepo) Post(id uint) (*entity.Post, []error) {
 
 // UpdatePost updates a given post in the database
 func (pRepo *PostGormRepo) UpdatePost(post *entity.Post) (*entity.Post, []error) {
-	
 	pst := post
 	errs := pRepo.conn.Save(pst).GetErrors()
 	if len(errs) > 0 {
@@ -51,7 +49,6 @@ func (pRepo *PostGormRepo) UpdatePost(post *entity.Post) (*entity.Post, []error)
 
 // DeletePost deletes a given post from the database
 func (pRepo *PostGormRepo) DeletePost(id uint) (*entity.Post, []error) {
-	
 	post, errs := pRepo.Post(id)
 	if len(errs) > 0 {
 		return nil, errs
@@ -66,7 +63,6 @@ func (pRepo *PostGormRepo) DeletePost(id uint) (*entity.Post, []error) {
 
 // StorePost stores a given post in the database
 func (pRepo *PostGormRepo) StorePost(post *entity.Post) (*entity.Post, []error) {
-	
 	pst := post
 	errs := pRepo.conn.Create(pst).GetErrors()
 	if len(errs) > 0 {

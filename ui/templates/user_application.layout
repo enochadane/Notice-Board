@@ -1,5 +1,9 @@
 {{ define "user_application.layout" }}
+<<<<<<< HEAD
 {{ template "no_jumb_navbar" . }}
+=======
+{{ template "navbar" . }}
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 {{ template "user_application.content" . }}
 {{ template "footer" . }}
 {{ end }}

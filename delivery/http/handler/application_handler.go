@@ -6,17 +6,16 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/amthesonofGod/Notice-Board/application"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
-	"github.com/amthesonofGod/Notice-Board/application"
-
 	// "github.com/satori/go.uuid"
 )
 
 // ApplicationHandler handles user job application requests
 type ApplicationHandler struct {
-	tmpl	*template.Template
-	appSrv	application.ApplicationService
+	tmpl    *template.Template
+	appSrv  application.ApplicationService
 	postSrv post.PostService
 }
 
@@ -26,7 +25,7 @@ func NewApplicationHandler(T *template.Template, AP application.ApplicationServi
 }
 
 // Applications handle requests on route /applications
-func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
+func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
@@ -65,7 +64,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	} else {
-		
+
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
@@ -150,4 +149,3 @@ func (ap *ApplicationHandler) ApplicationDelete(w http.ResponseWriter, r *http.R
 
 	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
 }
-

@@ -3,6 +3,7 @@ package post
 import "github.com/amthesonofGod/Notice-Board/entity"
 
 // PostRepository specifies post database operations
+//PostRepository ...
 type PostRepository interface {
 	Posts() ([]entity.Post, []error)
 	Post(id uint) (*entity.Post, []error)

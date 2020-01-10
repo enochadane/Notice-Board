@@ -3,25 +3,25 @@ package handler
 import (
 	"fmt"
 	"html/template"
-	"net/http"
 	"io"
+	"net/http"
 
+	"github.com/amthesonofGod/Notice-Board/User"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
-	"github.com/amthesonofGod/Notice-Board/post"
+	uuid "github.com/satori/go.uuid"
 
-	"github.com/satori/go.uuid"
+	"github.com/amthesonofGod/Notice-Board/post"
 )
 
 // UserHandler handles user requests
 type UserHandler struct {
-	tmpl	*template.Template
-	userSrv model.UserService
+	tmpl    *template.Template
+	userSrv User.UserService
 	postSrv post.PostService
 }
 
 // NewUserHandler initializes and returns new NewUserHandler
-func NewUserHandler(T *template.Template, US model.UserService, PS post.PostService) *UserHandler {
+func NewUserHandler(T *template.Template, US User.UserService, PS post.PostService) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
 }
 
@@ -48,17 +48,17 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("userpassword")
 
 		users, _ := uh.userSrv.Users()
-		
+
 		for _, user := range users {
 			if email == user.Email && password == user.Password {
 				fmt.Println("authentication successfull! ")
 
 				if err == http.ErrNoCookie {
 					sID, _ := uuid.NewV4()
-					cookie = &http.Cookie {
-						Name: "session",
+					cookie = &http.Cookie{
+						Name:  "session",
 						Value: sID.String(),
-						Path: "/",
+						Path:  "/",
 					}
 				}
 
@@ -71,11 +71,11 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 				if len(errs) > 0 {
 					panic(errs)
 				}
-				
+
 				http.SetCookie(w, cookie)
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
 				break
-			
+
 			} else {
 				fmt.Println("No such user!")
 			}
@@ -90,10 +90,10 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 // CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	
+
 	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
-		
+
 		usr := &entity.User{}
 		usr.Name = r.FormValue("username")
 		usr.Email = r.FormValue("useremail")
@@ -103,7 +103,7 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		users, _ := uh.userSrv.Users()
 
 		for _, user := range users {
-			
+
 			if usr.Email == user.Email {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 				fmt.Println("This Email is already in use! ")
@@ -119,10 +119,10 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 		if err == http.ErrNoCookie {
 			sID, _ := uuid.NewV4()
-			cookie = &http.Cookie {
-				Name: "session",
+			cookie = &http.Cookie{
+				Name:  "session",
 				Value: sID.String(),
-				Path: "/",
+				Path:  "/",
 			}
 		}
 
@@ -143,7 +143,6 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, cookie)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 
-		
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
@@ -167,10 +166,10 @@ func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 
 // Logout Logs the user out
 func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	
+
 	// get cookie
 	cookie, err := r.Cookie("session")
-	
+
 	if err != http.ErrNoCookie {
 		_, errs := uh.userSrv.DeleteSession(cookie.Value)
 		// session.DeleteSession

@@ -9,14 +9,13 @@ import (
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/request"
-
 	// "github.com/satori/go.uuid"
 )
 
 // RequestHandler handles user event join requests
 type RequestHandler struct {
-	tmpl	*template.Template
-	reqSrv	request.RequestService
+	tmpl    *template.Template
+	reqSrv  request.RequestService
 	postSrv post.PostService
 }
 
@@ -26,7 +25,7 @@ func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.
 }
 
 // Requests handle requests on route /requests
-func(rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
+func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
 	reqs, errs := rqh.reqSrv.Requests()
 	if len(errs) > 0 {

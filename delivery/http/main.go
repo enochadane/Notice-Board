@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	_ "github.com/lib/pq"
+
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
 
-	"github.com/amthesonofGod/Notice-Board/model/repository"
-	"github.com/amthesonofGod/Notice-Board/model/service"
+	repository "github.com/amthesonofGod/Notice-Board/User/repository"
+	service "github.com/amthesonofGod/Notice-Board/User/service"
+
+	repositoryCamp "github.com/amthesonofGod/Notice-Board/company/repositoryCamp"
+	serviceCamp "github.com/amthesonofGod/Notice-Board/company/serviceCamp"
 
 	postRepos "github.com/amthesonofGod/Notice-Board/post/repository"
 	postServ "github.com/amthesonofGod/Notice-Board/post/service"
@@ -31,7 +35,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "godisgood"
+	password = "kingo"
 	dbname   = "noticeboard"
 )
 
@@ -54,10 +58,10 @@ func createTables(dbconn *gorm.DB) []error {
 	return nil
 }
 
-func main()  {
+func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-    "password=%s dbname=%s sslmode=disable",
-	host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
 
 	dbconn, err := gorm.Open("postgres", psqlInfo)
 
@@ -75,8 +79,8 @@ func main()  {
 	// 	panic(err)
 	// }
 
-	companyRepo := repository.NewCompanyGormRepo(dbconn)
-	companySrv := service.NewCompanyService(companyRepo)
+	companyRepo := repositoryCamp.NewCompanyGormRepo(dbconn)
+	companySrv := serviceCamp.NewCompanyService(companyRepo)
 
 	postRepo := postRepos.NewPostGormRepo(dbconn)
 	postSrv := postServ.NewPostService(postRepo)
@@ -90,7 +94,6 @@ func main()  {
 	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
 	requestSrv := reqServ.NewRequestService(requestRepo)
 
-
 	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv)
 
 	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, postSrv)
@@ -101,20 +104,19 @@ func main()  {
 
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv)
 
-
 	r := mux.NewRouter()
-	
+
 	// Server CSS, JS & Images Statically.
 	// fs := http.FileServer(http.Dir("../../ui/assets"))
 	// r.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
-	
+
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
 	r.HandleFunc("/signup-account", usrHandler.CreateAccount)
 	r.HandleFunc("/home", usrHandler.Home)
-	
+
 	r.HandleFunc("/cmp", cmpHandler.SignInUp)
 	r.HandleFunc("/cmp-login", cmpHandler.Login)
 	r.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
@@ -133,5 +135,4 @@ func main()  {
 
 	http.ListenAndServe(":8080", r)
 }
-
 

@@ -19,6 +19,13 @@ type CompanySession struct {
 	UUID		string
 	CompanyID	uint
 }
+// Session represents sessions
+type Session struct {
+	gorm.Model
+	UUID		string
+	CompanyID	uint
+	UserID		uint
+}
 
 // Post represents Posts
 type Post struct {
@@ -39,6 +46,7 @@ type User struct {
 	Password 	string `gorm:"type:varchar(255);not null"`
 }
 
+
 // UserSession represents user sessions
 type UserSession struct {
 	gorm.Model
@@ -56,6 +64,7 @@ type Application struct {
 	Resume		string
 	PostID		uint
 	UserID		uint
+
 }
 
 // Request represents event join requests forwarded by application users
