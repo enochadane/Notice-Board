@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,7 +12,7 @@ type CompanyGormRepo struct {
 }
 
 // NewCompanyGormRepo will create a new object of CompanyGormRepo
-func NewCompanyGormRepo(db *gorm.DB) model.CompanyRepository {
+func NewCompanyGormRepo(db *gorm.DB) company.CompanyRepository {
 	return &CompanyGormRepo{conn: db}
 }
 

@@ -1,23 +1,23 @@
 package service
 
 import (
+	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 // CompanyService implements model.CompanyRepository interface
 type CompanyService struct {
-	companyRepo model.CompanyRepository
+	companyRepo company.CompanyRepository
 }
 
 // NewCompanyService will create new CompanyService object
-func NewCompanyService(CompanyRepos model.CompanyRepository) model.CompanyService {
+func NewCompanyService(CompanyRepos company.CompanyRepository) company.CompanyService {
 	return &CompanyService{companyRepo: CompanyRepos}
 }
 
 // Companies returns list of companies
-func (cs *CompanyService) Companies() ([]entity.Company, []error)  {
-	
+func (cs *CompanyService) Companies() ([]entity.Company, []error) {
+
 	companies, errs := cs.companyRepo.Companies()
 
 	if len(errs) > 0 {
@@ -29,7 +29,7 @@ func (cs *CompanyService) Companies() ([]entity.Company, []error)  {
 
 // StoreCompany persists new company information
 func (cs *CompanyService) StoreCompany(company *entity.Company) (*entity.Company, []error) {
-	
+
 	cmp, errs := cs.companyRepo.StoreCompany(company)
 
 	if len(errs) > 0 {
@@ -53,7 +53,7 @@ func (cs *CompanyService) Company(id uint) (*entity.Company, []error) {
 
 // UpdateCompany updates a company with new data
 func (cs *CompanyService) UpdateCompany(company *entity.Company) (*entity.Company, []error) {
-	
+
 	cmp, errs := cs.companyRepo.UpdateCompany(company)
 
 	if len(errs) > 0 {
@@ -65,7 +65,7 @@ func (cs *CompanyService) UpdateCompany(company *entity.Company) (*entity.Compan
 
 // DeleteCompany delete a company by its id
 func (cs *CompanyService) DeleteCompany(id uint) (*entity.Company, []error) {
-	
+
 	cmp, errs := cs.companyRepo.DeleteCompany(id)
 
 	if len(errs) > 0 {
@@ -76,7 +76,7 @@ func (cs *CompanyService) DeleteCompany(id uint) (*entity.Company, []error) {
 
 // StoreSession persists new session information
 func (cs *CompanyService) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
-	
+
 	s, errs := cs.companyRepo.StoreSession(session)
 
 	if len(errs) > 0 {
@@ -88,7 +88,7 @@ func (cs *CompanyService) StoreSession(session *entity.CompanySession) (*entity.
 
 // DeleteSession delete a session by its id
 func (cs *CompanyService) DeleteSession(uuid string) (*entity.CompanySession, []error) {
-	
+
 	s, errs := cs.companyRepo.DeleteSession(uuid)
 
 	if len(errs) > 0 {
@@ -108,4 +108,3 @@ func (cs *CompanyService) Session(uuid string) (*entity.CompanySession, []error)
 
 	return s, nil
 }
-

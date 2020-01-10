@@ -16,7 +16,7 @@ func NewUserRepositoryImpl(Conn *sql.DB) *UserRepositoryImpl {
 }
 
 func (usi *UserRepositoryImpl) Users() ([]entity.User, error) {
-	
+
 	rows, err := usi.conn.Query("SELECT * FROM users;")
 	if err != nil {
 		return nil, errors.New("Could not query the database")
@@ -39,7 +39,7 @@ func (usi *UserRepositoryImpl) Users() ([]entity.User, error) {
 }
 
 func (usi *UserRepositoryImpl) User(id int) (entity.User, error) {
-	
+
 	row := usi.conn.QueryRow("SELECT * FROM users WHERE id = $1", id)
 
 	u := entity.User{}
@@ -53,7 +53,7 @@ func (usi *UserRepositoryImpl) User(id int) (entity.User, error) {
 }
 
 func (usi *UserRepositoryImpl) UpdateUser(u entity.User) error {
-	
+
 	_, err := usi.conn.Exec("UPDATE users SET name=$1,email=$2, password=$3 WHERE id=$4", u.Name, u.Email, u.Password, u.ID)
 	if err != nil {
 		return errors.New("Update has failed")
@@ -63,7 +63,7 @@ func (usi *UserRepositoryImpl) UpdateUser(u entity.User) error {
 }
 
 func (usi *UserRepositoryImpl) DeleteUser(id int) error {
-	
+
 	_, err := usi.conn.Exec("DELETE FROM users WHERE id=$1", id)
 	if err != nil {
 		return errors.New("Delete has failed")
@@ -73,7 +73,7 @@ func (usi *UserRepositoryImpl) DeleteUser(id int) error {
 }
 
 func (usi *UserRepositoryImpl) StoreUser(u entity.User) error {
-	
+
 	_, err := usi.conn.Exec("INSERT INTO users (name,email,password) values($1, $2, $3)", u.Name, u.Email, u.Password)
 	if err != nil {
 		return errors.New("Insertion has failed")
@@ -81,8 +81,3 @@ func (usi *UserRepositoryImpl) StoreUser(u entity.User) error {
 
 	return nil
 }
-
-
-
-
-

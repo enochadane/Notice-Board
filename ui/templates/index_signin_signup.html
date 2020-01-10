@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Notice_board</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     <link rel="stylesheet" href="../assets/styles/index.css">
 
@@ -22,11 +22,12 @@
         <div class="container">
             <h1>Info Lehulum</h1>
             <div class="row">
-                <p class="display-6">Join our community and get updated!!</p>
+                <p class="display-6" id="abc">Join our community and get updated!!</p>
+                <p class="display-6" id="abcd">Join our community and<br> get updated!!</p>
                 <a href="/cmp"><button class="my-ghost jmb-btn">Company</button></a>
             </div>
-            
-        </div> 
+
+        </div>
     </div>
 
     <div class="center-align-form">
@@ -37,44 +38,87 @@
                 <div class="col-md-3"></div>
                 <div class="col-md-3"></div>
             </div>
-            <div class="my-form-container my-sign-up-container">
-                <form action="/signup-account" method="POST">
+            <div class="my-form-container my-sign-up-container" id="signup">
+                <form action="/signup_account" method="POST">
                     <h1>Create Account</h1>
-                    <div class="my-social-container">
+                    <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+                    </div> -->
                     <span>or use your email for registration</span>
-                    <input name="username" type="text" placeholder="Name" />
-                    <input name="useremail" type="email" placeholder="Email" />
-                    <input name="userpassword" type="password" placeholder="Password" />
+                    <input name="username" type="text" placeholder="Name" required/>
+                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <input name="userpassword" type="password" placeholder="Password" required/>
+                    <input name="confirmPassword" type="password" placeholder="Confirm Password" required/>
                     <button type="submit">Sign Up</button>
                 </form>
+
             </div>
-            <div class="my-form-container my-sign-in-container">
-                <form action="/login" method="POST">
-                    <h1>Sign in</h1>
-                    <div class="my-social-container">
+
+
+            <div class="my-form-container  my-sign-up-containerMobile" id="signupM">
+                <form action="/signup_account" method="POST" id="first">
+                    <h1>Create Account</h1>
+                    <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+                    </div> -->
+                    <span>or use your email for registration</span>
+                    <input name="username" type="text" placeholder="Name" required/>
+                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <input name="userpassword" type="password" placeholder="Password" required/>
+                    <button type="submit">Sign Up</button>
+                    <a id="loginLink">Login?</a>
+                </form>
+
+            </div>
+
+            <div class="my-form-container my-sign-in-container" id="signin">
+                <form action="/login" method="POST">
+                    <h1>Sign in</h1>
+                    <!-- <div class="my-social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div> -->
                     <span>or use your account</span>
-                    <input name="useremail" type="email" placeholder="Email" />
-                    <input name="userpassword" type="password" placeholder="Password" />
+                    <input name="useremail" type="email" placeholder="Email" required />
+                    <input name="userpassword" type="password" placeholder="Password" required/>
                     <a href="#">Forgot your password?</a>
                     <button type="submit">Sign In</button>
+
                 </form>
             </div>
+
+
+            <div class="my-form-container my-sign-in-containerMobile" id="signinM">
+                <form action="/login" method="POST">
+                    <h1>Sign in</h1>
+                    <!-- <div class="my-social-container">
+                        <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                        <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    </div> -->
+                    <span>or use your account</span>
+                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <input name="userpassword" type="password" placeholder="Password" required/>
+                    <a href="#">Forgot your password?</a>
+                    <button type="submit">Sign In</button>
+                    <a id="signupLink">Sign up?</a>
+                </form>
+
+
+            </div>
             <div class="my-overlay-container">
-                <div class="my-overlay">
+                <div class="my-overlay" id="over">
                     <div class="my-overlay-panel my-overlay-left">
                         <h1>Welcome Back!</h1>
                         <p>To keep connected with us please login with your personal info</p>
                         <button class="my-ghost" id="signIn">Sign In</button>
                     </div>
-                    <div class="my-overlay-panel my-overlay-right">
+                    <div class="my-overlay-panel my-overlay-right" id="king">
                         <h1>Hello, User!</h1>
                         <p>Enter your personal details and start journey with us</p>
                         <button class="my-ghost" id="signUp">Sign Up</button>
@@ -85,11 +129,16 @@
     </div>
     <footer class="bg-info">
         <p>
-            Info Lehulum works for your good contact <i class="fa fa-paper-plane" aria-hidden="true"></i>
+            INFO_LEHULUM<i class="fa fa-heart"></i> #
+            <a target="_blank" href="https://florin-pop.com">Florin Pop</a> - You can join us to create th world with ful Access of Information
+            <a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
         </p>
     </footer>
 
     <script src="../assets/bootstrap/js/index.js"></script>
 
+
+
 </body>
+
 </html>

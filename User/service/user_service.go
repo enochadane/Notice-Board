@@ -1,23 +1,23 @@
 package service
 
 import (
+	"github.com/amthesonofGod/Notice-Board/User"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 // UserService implements model.UserRepository interface
 type UserService struct {
-	userRepo model.UserRepository
+	userRepo User.UserRepository
 }
 
 // NewUserService will create new UserService object
-func NewUserService(UserRepos model.UserRepository) model.UserService {
+func NewUserService(UserRepos User.UserRepository) User.UserService {
 	return &UserService{userRepo: UserRepos}
 }
 
 // Users returns list of users
-func (us *UserService) Users() ([]entity.User, []error)  {
-	
+func (us *UserService) Users() ([]entity.User, []error) {
+
 	users, errs := us.userRepo.Users()
 
 	if len(errs) > 0 {
@@ -29,7 +29,7 @@ func (us *UserService) Users() ([]entity.User, []error)  {
 
 // StoreUser persists new user information
 func (us *UserService) StoreUser(user *entity.User) (*entity.User, []error) {
-	
+
 	usr, errs := us.userRepo.StoreUser(user)
 
 	if len(errs) > 0 {
@@ -53,7 +53,7 @@ func (us *UserService) User(id uint) (*entity.User, []error) {
 
 // UpdateUser updates a user with new data
 func (us *UserService) UpdateUser(user *entity.User) (*entity.User, []error) {
-	
+
 	usr, errs := us.userRepo.UpdateUser(user)
 
 	if len(errs) > 0 {
@@ -65,7 +65,7 @@ func (us *UserService) UpdateUser(user *entity.User) (*entity.User, []error) {
 
 // DeleteUser deletes a user by its id
 func (us *UserService) DeleteUser(id uint) (*entity.User, []error) {
-	
+
 	usr, errs := us.userRepo.DeleteUser(id)
 
 	if len(errs) > 0 {
@@ -77,7 +77,7 @@ func (us *UserService) DeleteUser(id uint) (*entity.User, []error) {
 
 // StoreSession persists new session information
 func (us *UserService) StoreSession(session *entity.UserSession) (*entity.UserSession, []error) {
-	
+
 	s, errs := us.userRepo.StoreSession(session)
 
 	if len(errs) > 0 {
@@ -89,7 +89,7 @@ func (us *UserService) StoreSession(session *entity.UserSession) (*entity.UserSe
 
 // DeleteSession delete a session by its id
 func (us *UserService) DeleteSession(uuid string) (*entity.UserSession, []error) {
-	
+
 	s, errs := us.userRepo.DeleteSession(uuid)
 
 	if len(errs) > 0 {
