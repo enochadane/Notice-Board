@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"NoticeBoard/entity"
+	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 type UserRepositoryImpl struct {
