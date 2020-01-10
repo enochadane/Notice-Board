@@ -75,7 +75,7 @@ func (cs *CompanyService) DeleteCompany(id uint) (*entity.Company, []error) {
 }
 
 // StoreSession persists new session information
-func (cs *CompanyService) StoreSession(session *entity.Session) (*entity.Session, []error) {
+func (cs *CompanyService) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
 	
 	s, errs := cs.companyRepo.StoreSession(session)
 
@@ -87,7 +87,7 @@ func (cs *CompanyService) StoreSession(session *entity.Session) (*entity.Session
 }
 
 // DeleteSession delete a session by its id
-func (cs *CompanyService) DeleteSession(uuid string) (*entity.Session, []error) {
+func (cs *CompanyService) DeleteSession(uuid string) (*entity.CompanySession, []error) {
 	
 	s, errs := cs.companyRepo.DeleteSession(uuid)
 
@@ -98,7 +98,7 @@ func (cs *CompanyService) DeleteSession(uuid string) (*entity.Session, []error) 
 }
 
 // Session returns a session object with a given id
-func (cs *CompanyService) Session(uuid string) (*entity.Session, []error) {
+func (cs *CompanyService) Session(uuid string) (*entity.CompanySession, []error) {
 
 	s, errs := cs.companyRepo.Session(uuid)
 

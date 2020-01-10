@@ -2,6 +2,6 @@
 
 {{ template "no_jumb_navbar" . }}
 {{ template "application_list.content" . }}
-{{ template "footer" .}}
+{{ template "footer" . }}
 
 {{ end }}

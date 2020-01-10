@@ -33,7 +33,7 @@ func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request
 		panic(errs)
 	}
 
-	ap.tmpl.ExecuteTemplate(w, "all_user_applications.layout", apps)
+	ap.tmpl.ExecuteTemplate(w, "application_list.layout", apps)
 }
 
 // Apply hanlde requests on route /job/apply

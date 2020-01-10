@@ -63,7 +63,7 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 
-				session := &entity.Session{}
+				session := &entity.CompanySession{}
 				session.UUID = cookie.Value
 				session.CompanyID = cmp.ID
 				// session.CompanyName = cmp.Name
@@ -97,6 +97,7 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 // CreateAccount handle requests on /cmp-signup-account
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	
+	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
 		
 		cmp := &entity.Company{}
@@ -121,12 +122,31 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		if len(errs) > 0 {
 			panic(errs)
 		}
-		fmt.Println(companies)
+
+		if err == http.ErrNoCookie {
+			sID, _ := uuid.NewV4()
+			cookie = &http.Cookie {
+				Name: "session",
+				Value: sID.String(),
+				Path: "/",
+			}
+		}
+
+		session := &entity.CompanySession{}
+		session.UUID = cookie.Value
+		session.CompanyID = cmp.ID
+
+		_, errs = ch.companySrv.StoreSession(session)
+
+		if len(errs) > 0 {
+			panic(errs)
+		}
 
 		fmt.Println(cmp)
 
 		fmt.Println("Company added to db")
 
+		http.SetCookie(w, cookie)
 		http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 
 		
@@ -157,7 +177,7 @@ func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
 }
 
-// Logout Logs the user out
+// Logout Logs the company out
 func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("logged-in")
 	if err != http.ErrNoCookie {
@@ -170,6 +190,6 @@ func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, cookie)
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/cmp", 302)
 }
 

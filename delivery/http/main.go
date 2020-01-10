@@ -45,7 +45,7 @@ func createTables(dbconn *gorm.DB) []error {
 
 	// dbconn.DropTableIfExists(&entity.Session{})
 	// errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
-	errs := dbconn.CreateTable(&entity.Post{}, &entity.Session{}, &entity.User{}, &entity.Company{}).GetErrors()
+	errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
 
 	if errs != nil {
 		return errs

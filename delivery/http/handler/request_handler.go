@@ -33,7 +33,7 @@ func(rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 		panic(errs)
 	}
 
-	rqh.tmpl.ExecuteTemplate(w, "all_user_applications.layout", reqs)
+	rqh.tmpl.ExecuteTemplate(w, "request_list.layout", reqs)
 }
 
 // Join hanlde requests on route /event/join
