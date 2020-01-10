@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,7 +12,7 @@ type CompanyGormRepo struct {
 }
 
 // NewCompanyGormRepo will create a new object of CompanyGormRepo
-func NewCompanyGormRepo(db *gorm.DB) company.CompanyRepository {
+func NewCompanyGormRepo(db *gorm.DB) model.CompanyRepository {
 	return &CompanyGormRepo{conn: db}
 }
 
@@ -71,7 +71,7 @@ func (cRepo *CompanyGormRepo) StoreCompany(company *entity.Company) (*entity.Com
 }
 
 // StoreSession stores a given session in the database
-func (cRepo *CompanyGormRepo) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
+func (cRepo *CompanyGormRepo) StoreSession(session *entity.Session) (*entity.Session, []error) {
 	s := session
 	errs := cRepo.conn.Create(s).GetErrors()
 	if len(errs) > 0 {
@@ -81,7 +81,7 @@ func (cRepo *CompanyGormRepo) StoreSession(session *entity.CompanySession) (*ent
 }
 
 // DeleteSession deletes a given session from the database
-func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.CompanySession, []error) {
+func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.Session, []error) {
 	s, errs := cRepo.Session(uuid)
 	if len(errs) > 0 {
 		return nil, errs
@@ -95,8 +95,8 @@ func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.CompanySession
 }
 
 // Session retrieve a session from the database by its id
-func (cRepo *CompanyGormRepo) Session(uuid string) (*entity.CompanySession, []error) {
-	s := entity.CompanySession{}
+func (cRepo *CompanyGormRepo) Session(uuid string) (*entity.Session, []error) {
+	s := entity.Session{}
 	errs := cRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs

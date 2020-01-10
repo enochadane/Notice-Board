@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package handler
 
 import (
@@ -140,3 +141,6 @@ func (rqh *RequestHandler) RequestDelete(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
 }
+=======
+package handler
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f

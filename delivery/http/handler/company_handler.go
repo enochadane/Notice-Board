@@ -5,17 +5,27 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"io"
 
+<<<<<<< HEAD
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
 
 	"github.com/amthesonofGod/Notice-Board/post"
 
 	uuid "github.com/satori/go.uuid"
+=======
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
+	"github.com/amthesonofGod/Notice-Board/post"
+
+	"github.com/satori/go.uuid"
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 )
 
 // CompanyHandler handles company handler admin requests
 type CompanyHandler struct {
+<<<<<<< HEAD
 	tmpl       *template.Template
 	companySrv company.CompanyService
 	postSrv    post.PostService
@@ -23,6 +33,15 @@ type CompanyHandler struct {
 
 // NewCompanyHandler initializes and returns new NewCompanyHandler
 func NewCompanyHandler(T *template.Template, CS company.CompanyService, PS post.PostService) *CompanyHandler {
+=======
+	tmpl		*template.Template
+	companySrv 	model.CompanyService
+	postSrv		post.PostService
+}
+
+// NewCompanyHandler initializes and returns new NewCompanyHandler
+func NewCompanyHandler(T *template.Template, CS model.CompanyService, PS post.PostService) *CompanyHandler {
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	return &CompanyHandler{tmpl: T, companySrv: CS, postSrv: PS}
 }
 
@@ -54,6 +73,7 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		for _, cmp := range companies {
 			if cmp.Email == email && cmp.Password == password {
 				fmt.Println("authentication successfull! ")
+<<<<<<< HEAD
 
 				if errc == http.ErrNoCookie {
 					sID, _ := uuid.NewV4()
@@ -65,6 +85,19 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 				}
 
 				session := &entity.CompanySession{}
+=======
+				
+				if errc == http.ErrNoCookie {
+					sID, _ := uuid.NewV4()
+					cookie = &http.Cookie{
+						Name: "session",
+						Value: sID.String(),
+						Path: "/",
+					}
+				}
+
+				session := &entity.Session{}
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 				session.UUID = cookie.Value
 				session.CompanyID = cmp.ID
 				// session.CompanyName = cmp.Name
@@ -76,10 +109,17 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 				}
 
 				fmt.Println(session.UUID)
+<<<<<<< HEAD
 
 				http.SetCookie(w, cookie)
 				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 
+=======
+				
+				http.SetCookie(w, cookie)
+				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
+				
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 				break
 
 			} else {
@@ -87,6 +127,10 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+<<<<<<< HEAD
+=======
+		
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 		io.WriteString(w, cookie.String())
 
 	} else {
@@ -99,7 +143,11 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 		cmp := &entity.Company{}
 		cmp.Name = r.FormValue("companyname")
 		cmp.Email = r.FormValue("companyemail")
@@ -121,6 +169,7 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		if len(errs) > 0 {
 			panic(errs)
+<<<<<<< HEAD
 		}
 
 		if err == http.ErrNoCookie {
@@ -141,6 +190,10 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		if len(errs) > 0 {
 			panic(errs)
 		}
+=======
+		}
+		fmt.Println(companies)
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 
 		fmt.Println(cmp)
 
@@ -167,7 +220,24 @@ func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	posts, _ := ch.postSrv.Posts()
+<<<<<<< HEAD
 
+=======
+	// for _, post := range posts {
+	// 	cmp, _ := ch.companySrv.Company(post.CompanyID)
+	// 	// if len(err) > 0 {
+	// 	// 	panic(err)
+	// 	// }
+
+	// 	m = make(map[entity.Post]string)
+	// 	m[post] = cmp.Name
+	// 	// fmt.Println(m[post])
+
+	// 	// fmt.Println(cmp.Name)
+
+	// }
+	
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", posts)
 }
 
@@ -176,12 +246,20 @@ func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
 }
 
+<<<<<<< HEAD
 // Logout Logs the company out
+=======
+// Logout Logs the user out
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("logged-in")
 	if err != http.ErrNoCookie {
 		cookie = &http.Cookie{
+<<<<<<< HEAD
 			Name:  "logged-in",
+=======
+			Name: "logged-in",
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 			Value: "0",
 		}
 		// session := data.Session{Uuid: cookie.Value}
@@ -189,5 +267,11 @@ func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, cookie)
+<<<<<<< HEAD
 	http.Redirect(w, r, "/cmp", 302)
 }
+=======
+	http.Redirect(w, r, "/", 302)
+}
+
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
