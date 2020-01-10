@@ -10,13 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-<<<<<<< HEAD
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
-=======
-	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	"github.com/amthesonofGod/Notice-Board/post"
 )
 
@@ -24,19 +19,11 @@ import (
 type CompanyPostHandler struct {
 	tmpl       *template.Template
 	postSrv    post.PostService
-<<<<<<< HEAD
 	companySrv company.CompanyService
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
 func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company.CompanyService) *CompanyPostHandler {
-=======
-	companySrv model.CompanyService
-}
-
-// NewCompanyPostHandler initializes and returns new CompanyPostHandler
-func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP model.CompanyService) *CompanyPostHandler {
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	return &CompanyPostHandler{tmpl: T, postSrv: PS, companySrv: CP}
 }
 
@@ -56,15 +43,9 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 
 	authorizedPost := []entity.Post{}
 
-<<<<<<< HEAD
 	posts, errs := cph.postSrv.Posts()
 	if len(errs) > 0 {
 		panic(errs)
-=======
-	posts, err := cph.postSrv.Posts()
-	if err != nil {
-		panic(err)
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	}
 	for _, post := range posts {
 		if s.CompanyID == post.CompanyID {

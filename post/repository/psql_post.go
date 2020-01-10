@@ -48,11 +48,7 @@ func (pri *PostRepositoryImpl) Post(id int) (entity.Post, error) {
 
 	post := entity.Post{}
 
-<<<<<<< HEAD:post/repository/psql_post.go
-	err := row.Scan(&post.ID, &post.Title, &post.Description, &post.Image, &post.Category)
-=======
 	err := row.Scan(&post.ID, &post.CompanyID, &post.Title, &post.Description, &post.Image, &post.Category)
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f:model/repository/psql_post.go
 	if err != nil {
 		return post, err
 	}
@@ -85,11 +81,6 @@ func (pri *PostRepositoryImpl) DeletePost(id int) error {
 
 //StorePost ...
 func (pri *PostRepositoryImpl) StorePost(post entity.Post) error {
-<<<<<<< HEAD:post/repository/psql_post.go
-	
-=======
-
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f:model/repository/psql_post.go
 	_, err := pri.conn.Exec("INSERT INTO posts (title,description,image,category) values($1, $2, $3,$4)", post.Title, post.Description, post.Image, post.Category)
 	if err != nil {
 		return errors.New("Insertion has failed")

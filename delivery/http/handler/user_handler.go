@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-<<<<<<< HEAD
 	"github.com/amthesonofGod/Notice-Board/User"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	uuid "github.com/satori/go.uuid"
@@ -34,44 +33,11 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-=======
-	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
-	"github.com/amthesonofGod/Notice-Board/post"
-)
-
-// UserHandler ...
-type UserHandler struct {
-	tmpl    *template.Template
-	userSrv model.UserService
-	postSrv post.PostService
-}
-
-// NewUserHandler ...
-func NewUserHandler(T *template.Template, US model.UserService, PS post.PostService) *UserHandler {
-	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
-}
-
-// Index ...
-func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
-
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 
 }
 
-<<<<<<< HEAD
 // Login handle requests on /login
-=======
-//User ...
-
-// Login ...
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("session")
@@ -122,16 +88,10 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-<<<<<<< HEAD
 // CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("session")
-=======
-// CreateAccount ...
-func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	if r.Method == http.MethodPost {
 
 		usr := &entity.User{}
@@ -153,7 +113,6 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 		_, errs := uh.userSrv.StoreUser(usr)
 
-<<<<<<< HEAD
 		if len(errs) > 0 {
 			panic(errs)
 		}
@@ -184,38 +143,13 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, cookie)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 
-=======
-		_, errs := uh.userSrv.StoreUser(usr)
-
-		if len(errs) > 0 {
-			panic(errs)
-		}
-
-		fmt.Println(users)
-
-		fmt.Println(usr)
-
-		fmt.Println("User added to db")
-
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-
-		// } else {
-		// 	http.Redirect(w, r, "/signup", http.StatusSeeOther)
-		// 	fmt.Println("Password doesn't match! ")
-		// }
-
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
 
 }
 
-<<<<<<< HEAD
 // Home handle requests on /home
-=======
-// Home ...
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 
 	//get cookie
@@ -229,7 +163,6 @@ func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
 }
-<<<<<<< HEAD
 
 // Logout Logs the user out
 func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
@@ -248,5 +181,3 @@ func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/", 302)
 }
-=======
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f

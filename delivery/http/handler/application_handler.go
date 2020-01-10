@@ -1,34 +1,21 @@
 package handler
 
 import (
-<<<<<<< HEAD
 	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
 
+	"github.com/amthesonofGod/Notice-Board/application"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
-	"github.com/amthesonofGod/Notice-Board/application"
-
 	// "github.com/satori/go.uuid"
-=======
-	"html/template"
-
-	"github.com/amthesonofGod/Notice-Board/application"
-	"github.com/amthesonofGod/Notice-Board/post"
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 )
 
 // ApplicationHandler handles user job application requests
 type ApplicationHandler struct {
-<<<<<<< HEAD
-	tmpl	*template.Template
-	appSrv	application.ApplicationService
-=======
 	tmpl    *template.Template
 	appSrv  application.ApplicationService
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
 	postSrv post.PostService
 }
 
@@ -36,10 +23,9 @@ type ApplicationHandler struct {
 func NewApplicationHandler(T *template.Template, AP application.ApplicationService, PS post.PostService) *ApplicationHandler {
 	return &ApplicationHandler{tmpl: T, appSrv: AP, postSrv: PS}
 }
-<<<<<<< HEAD
 
 // Applications handle requests on route /applications
-func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
+func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
@@ -78,7 +64,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	} else {
-		
+
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
@@ -163,6 +149,3 @@ func (ap *ApplicationHandler) ApplicationDelete(w http.ResponseWriter, r *http.R
 
 	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
 }
-
-=======
->>>>>>> 56480e1450127de4cec062eea25b723b5216035f
