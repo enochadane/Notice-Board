@@ -5,12 +5,12 @@ import (
 	"html/template"
 	"net/http"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type UserHandler struct {
-	tmpl          *template.Teplte
+	tmpl  *template.Template
 	userSrv model.UserService
 	postSrv model.PostService
 }
@@ -74,19 +74,21 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 		// if usr.Password == confirmpass {
 
-	err := uh.userSrv.StoreUser(usr)
+		err := uh.userSrv.StoreUser(usr)
 
-		f err != nil {
-			anic(err)
+		if err != nil {
+			panic(err)
+
+		fmt.Println(users)
+
+  
+		fmt.Println(usr)
 		
-
-	fmt.Println(users)
-
-	fmt.Println(usr)
-
-	fmt.Println("User added to db")
-
-		ttp.Redirect(w, r, "/home", http.StatusSeeOther)
+		fmt.Println("User added to db")
+		
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+			}
+		
 
 		// } else {
 		// 	http.Redirect(w, r, "/signup", http.StatusSeeOther)
@@ -98,14 +100,11 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
 func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 	posts, _ := uh.postSrv.Posts()
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
 }
 
-
-
-
-
-
+func (uh *UserHandler) ShowUserProfile(w http.ResponseWriter, r *http.Request) {
+	uh.tmpl.ExecuteTemplate(w, "user-profile.layout", nil)
+}

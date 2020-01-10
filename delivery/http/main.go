@@ -8,9 +8,9 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
 
-	"NoticeBoard/model/repository"
-	"NoticeBoard/model/service"
-	"NoticeBoard/delivery/http/handler"
+	"github.com/amthesonofGod/Notice-Board/model/repository"
+	"github.com/amthesonofGod/Notice-Board/model/service"
+	"github.com/amthesonofGod/Notice-Board/delivery/http/handler"
 )
 
 const (
@@ -81,6 +81,7 @@ func main()  {
 	r.HandleFunc("/login", usrHandler.Login)
 	r.HandleFunc("/signup_account", usrHandler.CreateAccount)
 	r.HandleFunc("/home", usrHandler.Home)
+	r.HandleFunc("/user-profile", usrHandler.ShowUserProfile)
 	
 	// r.HandleFunc("/cmp-signin", cmpHandler.Signin)
 	// r.HandleFunc("/cmp-signup", cmpHandler.Signup)
@@ -90,6 +91,8 @@ func main()  {
 	r.HandleFunc("/cmp-home", cmpHandler.Home)
 	r.HandleFunc("/admin", cmpHandler.Admin)
 	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
+
+	
 
 	r.HandleFunc("/admin/post-job", postHandler.CompanyPostsNew)
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
