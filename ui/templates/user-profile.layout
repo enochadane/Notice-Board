@@ -1,0 +1,6 @@
+{{ define "user-profile.layout" }}
+
+{{ template "user-profile.content" . }}
+{{ template "footer" . }}
+
+{{ end }}
