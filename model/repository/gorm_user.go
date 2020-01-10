@@ -69,3 +69,37 @@ func (uRepo *UserGormRepo) StoreUser(user *entity.User) (*entity.User, []error) 
 	}
 	return usr, errs
 }
+
+// StoreSession stores a given session in the database
+func (uRepo *UserGormRepo) StoreSession(session *entity.UserSession) (*entity.UserSession, []error) {
+	s := session
+	errs := uRepo.conn.Create(s).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return s, errs
+}
+
+// DeleteSession deletes a given session from the database
+func (uRepo *UserGormRepo) DeleteSession(uuid string) (*entity.UserSession, []error) {
+	s, errs := uRepo.Session(uuid)
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	errs = uRepo.conn.Delete(s, s.UUID).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return s, errs
+}
+
+// Session retrieve a session from the database by its id
+func (uRepo *UserGormRepo) Session(uuid string) (*entity.UserSession, []error) {
+	s := entity.UserSession{}
+	errs := uRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return &s, errs
+}

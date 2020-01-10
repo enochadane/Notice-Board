@@ -75,3 +75,37 @@ func (us *UserService) DeleteUser(id uint) (*entity.User, []error) {
 	return usr, nil
 }
 
+// StoreSession persists new session information
+func (us *UserService) StoreSession(session *entity.UserSession) (*entity.UserSession, []error) {
+	
+	s, errs := us.userRepo.StoreSession(session)
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	return s, nil
+}
+
+// DeleteSession delete a session by its id
+func (us *UserService) DeleteSession(uuid string) (*entity.UserSession, []error) {
+	
+	s, errs := us.userRepo.DeleteSession(uuid)
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return s, nil
+}
+
+// Session returns a session object with a given id
+func (us *UserService) Session(uuid string) (*entity.UserSession, []error) {
+
+	s, errs := us.userRepo.Session(uuid)
+
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	return s, nil
+}

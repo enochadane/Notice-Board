@@ -1,5 +1,5 @@
 {{ define "user_application.layout" }}
-{{ template "navbar" . }}
+{{ template "no_jumb_navbar" . }}
 {{ template "user_application.content" . }}
 {{ template "footer" . }}
 {{ end }}

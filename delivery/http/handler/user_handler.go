@@ -4,22 +4,28 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"io"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/model"
 	"github.com/amthesonofGod/Notice-Board/post"
+
+	"github.com/satori/go.uuid"
 )
 
+// UserHandler handles user requests
 type UserHandler struct {
 	tmpl	*template.Template
 	userSrv model.UserService
 	postSrv post.PostService
 }
 
+// NewUserHandler initializes and returns new NewUserHandler
 func NewUserHandler(T *template.Template, US model.UserService, PS post.PostService) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
 }
 
+// Index handle requests on /
 func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
@@ -31,7 +37,11 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Login handle requests on /login
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+
+	cookie, err := r.Cookie("session")
+
 	if r.Method == http.MethodPost {
 
 		email := r.FormValue("useremail")
@@ -40,9 +50,29 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		users, _ := uh.userSrv.Users()
 		
 		for _, user := range users {
-			fmt.Println(users)
 			if email == user.Email && password == user.Password {
 				fmt.Println("authentication successfull! ")
+
+				if err == http.ErrNoCookie {
+					sID, _ := uuid.NewV4()
+					cookie = &http.Cookie {
+						Name: "session",
+						Value: sID.String(),
+						Path: "/",
+					}
+				}
+
+				session := &entity.UserSession{}
+				session.UUID = cookie.Value
+				session.UserID = user.ID
+
+				_, errs := uh.userSrv.StoreSession(session)
+
+				if len(errs) > 0 {
+					panic(errs)
+				}
+				
+				http.SetCookie(w, cookie)
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
 				break
 			
@@ -50,13 +80,18 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("No such user!")
 			}
 		}
+
+		io.WriteString(w, cookie.String())
+
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
 }
 
+// CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	
+	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
 		
 		usr := &entity.User{}
@@ -76,26 +111,38 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// if usr.Password == confirmpass {
+		_, errs := uh.userSrv.StoreUser(usr)
 
-			_, errs := uh.userSrv.StoreUser(usr)
+		if len(errs) > 0 {
+			panic(errs)
+		}
 
-			if len(errs) > 0 {
-				panic(errs)
+		if err == http.ErrNoCookie {
+			sID, _ := uuid.NewV4()
+			cookie = &http.Cookie {
+				Name: "session",
+				Value: sID.String(),
+				Path: "/",
 			}
+		}
 
-			fmt.Println(users)
+		session := &entity.UserSession{}
+		session.UUID = cookie.Value
+		session.UserID = usr.ID
 
-			fmt.Println(usr)
+		_, errs = uh.userSrv.StoreSession(session)
 
-			fmt.Println("User added to db")
+		if len(errs) > 0 {
+			panic(errs)
+		}
 
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		fmt.Println(usr)
 
-		// } else {
-		// 	http.Redirect(w, r, "/signup", http.StatusSeeOther)
-		// 	fmt.Println("Password doesn't match! ")
-		// }
+		fmt.Println("User added to db")
+
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+
 		
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
@@ -103,7 +150,35 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Home handle requests on /home
 func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
+
+	//get cookie
+	_, err := r.Cookie("session")
+	if err != nil {
+		fmt.Println("no cookie")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	posts, _ := uh.postSrv.Posts()
+
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
+}
+
+// Logout Logs the user out
+func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	
+	// get cookie
+	cookie, err := r.Cookie("session")
+	
+	if err != http.ErrNoCookie {
+		_, errs := uh.userSrv.DeleteSession(cookie.Value)
+		// session.DeleteSession
+		if len(errs) > 0 {
+			panic(errs)
+		}
+	}
+
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, "/", 302)
 }

@@ -111,7 +111,7 @@
                     </div>
                 </div>
             </div> -->
-            <div class="col-6">
+            <div class="col-6" style="border: 3px black; margin-left: auto; margin-right: auto;">
                 <div class="container">
                     <div class="row">
                         {{ range . }}
@@ -120,6 +120,10 @@
                             <div class="row"> <h5> {{ .Title }} </h5></div>
                             <div class="row"> <p> {{ .Description}} </p></div>
                             <div class="row"> <img src="/assets/img/{{ .Image }}" width="250rem" height="275rem"/> </div>
+                        </div>
+                        <div>
+                            <a href="/job/apply">apply</a>
+                            <a href="/event/join">join</a>
                         </div>
                         {{ end }}
                     </div>

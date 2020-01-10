@@ -71,7 +71,7 @@ func (cRepo *CompanyGormRepo) StoreCompany(company *entity.Company) (*entity.Com
 }
 
 // StoreSession stores a given session in the database
-func (cRepo *CompanyGormRepo) StoreSession(session *entity.Session) (*entity.Session, []error) {
+func (cRepo *CompanyGormRepo) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
 	s := session
 	errs := cRepo.conn.Create(s).GetErrors()
 	if len(errs) > 0 {
@@ -81,7 +81,7 @@ func (cRepo *CompanyGormRepo) StoreSession(session *entity.Session) (*entity.Ses
 }
 
 // DeleteSession deletes a given session from the database
-func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.Session, []error) {
+func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.CompanySession, []error) {
 	s, errs := cRepo.Session(uuid)
 	if len(errs) > 0 {
 		return nil, errs
@@ -95,8 +95,8 @@ func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.Session, []err
 }
 
 // Session retrieve a session from the database by its id
-func (cRepo *CompanyGormRepo) Session(uuid string) (*entity.Session, []error) {
-	s := entity.Session{}
+func (cRepo *CompanyGormRepo) Session(uuid string) (*entity.CompanySession, []error) {
+	s := entity.CompanySession{}
 	errs := cRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs

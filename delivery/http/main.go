@@ -15,6 +15,12 @@ import (
 	postRepos "github.com/amthesonofGod/Notice-Board/post/repository"
 	postServ "github.com/amthesonofGod/Notice-Board/post/service"
 
+	appRepos "github.com/amthesonofGod/Notice-Board/application/repository"
+	appServ "github.com/amthesonofGod/Notice-Board/application/service"
+
+	reqRepos "github.com/amthesonofGod/Notice-Board/request/repository"
+	reqServ "github.com/amthesonofGod/Notice-Board/request/service"
+
 	"github.com/amthesonofGod/Notice-Board/delivery/http/handler"
 
 	"github.com/jinzhu/gorm"
@@ -38,7 +44,8 @@ func init() {
 func createTables(dbconn *gorm.DB) []error {
 
 	// dbconn.DropTableIfExists(&entity.Session{})
-	errs := dbconn.CreateTable(&entity.Post{}, &entity.Session{}, &entity.User{}, &entity.Company{}).GetErrors()
+	// errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
+	errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
 
 	if errs != nil {
 		return errs
@@ -77,20 +84,22 @@ func main()  {
 	userRepo := repository.NewUserGormRepo(dbconn)
 	userSrv := service.NewUserService(userRepo)
 
+	applicationRepo := appRepos.NewApplicationGormRepo(dbconn)
+	applicationSrv := appServ.NewApplicationService(applicationRepo)
+
+	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
+	requestSrv := reqServ.NewRequestService(requestRepo)
+
+
+	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv)
+
+	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, postSrv)
+
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv)
 
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv)
-
-
-
-	// dbconn.Model(company).Find(company)
-	// for _, p := range postSrv.Posts {
-	// 	dbconn.Model(company).Association("Posts").Append(p)
-	// }
-
-
 
 
 	r := mux.NewRouter()
@@ -103,7 +112,7 @@ func main()  {
 	
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
-	r.HandleFunc("/signup_account", usrHandler.CreateAccount)
+	r.HandleFunc("/signup-account", usrHandler.CreateAccount)
 	r.HandleFunc("/home", usrHandler.Home)
 	
 	r.HandleFunc("/cmp", cmpHandler.SignInUp)
@@ -111,10 +120,16 @@ func main()  {
 	r.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
 	r.HandleFunc("/cmp-home", cmpHandler.Home)
 	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
-
 	r.HandleFunc("/admin", cmpHandler.Admin)
+
 	r.HandleFunc("/admin/posts/new", postHandler.CompanyPostsNew)
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
+
+	r.HandleFunc("/job/apply", applicationHandler.Apply)
+	r.HandleFunc("/applicatons", applicationHandler.Applications)
+
+	r.HandleFunc("/event/join", requestHandler.Join)
+	r.HandleFunc("/requests", requestHandler.Requests)
 
 	http.ListenAndServe(":8080", r)
 }
