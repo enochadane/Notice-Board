@@ -5,8 +5,8 @@ import (
 	"html/template"
 	"net/http"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type CompanyHandler struct {
@@ -104,5 +104,5 @@ func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
-	ch.tmpl.ExecuteTemplate(w, "cmp_profile.layout", nil)
+	ch.tmpl.ExecuteTemplate(w, "cmp-profile.layout", nil)
 }

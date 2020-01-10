@@ -1,8 +1,8 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type UserServiceImpl struct {
@@ -13,7 +13,7 @@ func NewUserServiceImpl(UserRepos model.UserRepository) *UserServiceImpl {
 	return &UserServiceImpl{userRepo: UserRepos}
 }
 
-func (us *UserServiceImpl) Users() ([]entity.User, error)  
+func (us *UserServiceImpl) Users() ([]entity.User, error)  {
 
 	users, err := us.userRepo.Users()
 

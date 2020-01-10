@@ -1,6 +1,6 @@
 package model
 
-import "NoticeBoard/entity"
+import "github.com/amthesonofGod/Notice-Board/entity"
 
 type UserRepository interface {
 	Users() ([]entity.User, error)

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type PostServiceImpl struct {

@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type CompanyPostHandler struct {

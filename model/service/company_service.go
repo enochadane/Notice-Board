@@ -1,8 +1,8 @@
 package service
 
 import (
-	"NoticeBoard/entity"
-	"NoticeBoard/model"
+	"github.com/amthesonofGod/Notice-Board/entity"
+	"github.com/amthesonofGod/Notice-Board/model"
 )
 
 type CompanyServiceImpl struct {
@@ -13,7 +13,7 @@ func NewCompanyServiceImpl(CompanyRepos model.CompanyRepository) *CompanyService
 	return &CompanyServiceImpl{companyRepo: CompanyRepos}
 }
 
-func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error) 
+func (cs *CompanyServiceImpl) Companies() ([]entity.Company, error) {
 
 	companies, err := cs.companyRepo.Companies()
 
