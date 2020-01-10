@@ -1,6 +1,7 @@
 {{ define "application_list.layout" }}
 
 {{ template "no_jumb_navbar" . }}
+{{ template "side_navbar.content" . }}
 {{ template "application_list.content" . }}
 {{ template "footer" . }}
 

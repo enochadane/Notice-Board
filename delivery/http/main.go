@@ -44,8 +44,8 @@ func init() {
 func createTables(dbconn *gorm.DB) []error {
 
 	// dbconn.DropTableIfExists(&entity.Session{})
-	// errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
-	errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
+	errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
+	// errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
 
 	if errs != nil {
 		return errs
@@ -93,7 +93,7 @@ func main()  {
 
 	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv)
 
-	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, postSrv)
+	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
 
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
 
@@ -126,7 +126,7 @@ func main()  {
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
 
 	r.HandleFunc("/job/apply", applicationHandler.Apply)
-	r.HandleFunc("/applicatons", applicationHandler.Applications)
+	r.HandleFunc("/applications", applicationHandler.Applications)
 
 	r.HandleFunc("/event/join", requestHandler.Join)
 	r.HandleFunc("/requests", requestHandler.Requests)

@@ -1,5 +1,6 @@
 {{ define "request_list.layout" }}
 {{ template "no_jumb_navbar" . }}
+{{ template "side_navbar.content" . }}
 {{ template "request_list.content" . }}
 {{ template "footer" . }}
 {{ end }}

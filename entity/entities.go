@@ -31,6 +31,13 @@ type Post struct {
 	Owner		string `gorm:"type:varchar(255);not null"`
 }
 
+// PostSession represents post sessions
+type PostSession struct {
+	gorm.Model
+	UUID	string
+	PostID	uint
+}
+
 // User represents Users
 type User struct {
 	gorm.Model

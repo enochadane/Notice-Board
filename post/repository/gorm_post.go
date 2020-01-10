@@ -74,3 +74,37 @@ func (pRepo *PostGormRepo) StorePost(post *entity.Post) (*entity.Post, []error) 
 	}
 	return pst, errs
 }
+
+// // StoreSession stores a given session in the database
+// func (pRepo *PostGormRepo) StoreSession(session *entity.PostSession) (*entity.PostSession, []error) {
+// 	s := session
+// 	errs := pRepo.conn.Create(s).GetErrors()
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return s, errs
+// }
+
+// // DeleteSession deletes a given session from the database
+// func (pRepo *PostGormRepo) DeleteSession(uuid string) (*entity.PostSession, []error) {
+// 	s, errs := pRepo.Session(uuid)
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+
+// 	errs = pRepo.conn.Delete(s, s.UUID).GetErrors()
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return s, errs
+// }
+
+// // Session retrieve a session from the database by its id
+// func (pRepo *PostGormRepo) Session(uuid string) (*entity.PostSession, []error) {
+// 	s := entity.CompanySession{}
+// 	errs := pRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return &s, errs
+// }

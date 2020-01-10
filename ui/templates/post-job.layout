@@ -1,5 +1,6 @@
 {{ define "post-job.layout"}}
-{{ template "cmp_navbar" . }}
+{{ template "no_jumb_navbar" . }}
+{{ template "cmp_side_navbar.content" . }}
 {{ template "post-job.content" . }}
 {{ template "footer" . }}
 {{ end }}

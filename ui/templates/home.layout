@@ -1,6 +1,7 @@
 {{ define "home.layout" }}
 
 {{ template "navbar" . }}
+{{ template "side_navbar.content" . }}
 {{ template "home.content" . }}
 {{ template "footer" . }}
 

@@ -33,9 +33,10 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 	
 
 	var cookie, cerr = r.Cookie("session")
-	if cerr == nil {
-		cookievalue := cookie.Value
-		fmt.Println(cookievalue)
+	if cerr != nil {
+		fmt.Println("no cookie")
+		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
+		return
 	}
 
 	s, serr := cph.companySrv.Session(cookie.Value)

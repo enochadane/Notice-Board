@@ -1,0 +1,6 @@
+{{ define "received_applications.layout" }}
+{{ template "no_jumb_navbar" . }}
+{{ template "cmp_side_navbar.content" . }}
+{{ template "received_application.content" . }}
+{{ template "footer" . }}
+{{ end }}

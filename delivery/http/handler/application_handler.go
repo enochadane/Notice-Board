@@ -6,40 +6,110 @@ import (
 	"net/http"
 	"strconv"
 
+	// "io/ioutil"
+	// "log"
+
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/application"
+	"github.com/amthesonofGod/Notice-Board/model"
 
-	// "github.com/satori/go.uuid"
 )
 
 // ApplicationHandler handles user job application requests
 type ApplicationHandler struct {
 	tmpl	*template.Template
 	appSrv	application.ApplicationService
+	userSrv model.UserService
 	postSrv post.PostService
 }
 
 // NewApplicationHandler initializes and returns new ApplicationHandler
-func NewApplicationHandler(T *template.Template, AP application.ApplicationService, PS post.PostService) *ApplicationHandler {
-	return &ApplicationHandler{tmpl: T, appSrv: AP, postSrv: PS}
+func NewApplicationHandler(T *template.Template, AP application.ApplicationService, US model.UserService, PS post.PostService) *ApplicationHandler {
+	return &ApplicationHandler{tmpl: T, appSrv: AP, userSrv: US, postSrv: PS}
 }
 
 // Applications handle requests on route /applications
 func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
+
+	cookie, _ := r.Cookie("session")
+
+	s, serr := ap.userSrv.Session(cookie.Value)
+
+	if len(serr) > 0 {
+		panic(serr)
+	}
 
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
 	}
 
-	ap.tmpl.ExecuteTemplate(w, "application_list.layout", apps)
+	userApplications := []entity.Application{}
+
+	for _, app := range apps {
+		if s.UserID == app.UserID {
+			userApplications = append(userApplications, app)
+		}
+	}
+
+	// type MyApplication struct {
+	// 	userApplications []entity.Application
+	// 	cmp.Name		string
+	// }
+
+	ap.tmpl.ExecuteTemplate(w, "application_list.layout", userApplications)
 }
 
 // Apply hanlde requests on route /job/apply
 func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
+	if r.Method == http.MethodGet {
+
+		idRaw := r.URL.Query().Get("id")
+		id, err := strconv.Atoi(idRaw)
+
+		// fmt.Println(id)
+
+		if err != nil {
+			panic(err)
+		}
+
+		post, errs := ap.postSrv.Post(uint(id))
+
+		if len(errs) > 0 {
+			panic(errs)
+		}
+
+		// values := url.Values{}
+		// values.Add("pstid", idRaw)
+
+		// appForm := struct {
+		// 	Values	url.Values
+		// 	Post	*entity.Post
+		// }{
+		// 	Values:	values,
+		// 	Post:	post,
+		// }
+
+		ap.tmpl.ExecuteTemplate(w, "user_application.layout", post)
+
+	} 
+
 	if r.Method == http.MethodPost {
+
+		// // Parse the form data
+		// err := r.ParseForm()
+		// if err != nil {
+		// 	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		// 	return
+		// }
+
+		// pstID, err := strconv.Atoi(r.FormValue("pstid"))
+
+		// if err != nil {
+		// 	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		// }
 
 		app := &entity.Application{}
 		app.FullName = r.FormValue("fullname")
@@ -57,16 +127,35 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		writeFile(&mf, fh.Filename)
 
-		_, errs := ap.appSrv.StoreApplication(app)
+		cookie, _ := r.Cookie("session")
+		s, errs := ap.userSrv.Session(cookie.Value)
+
+		app.UserID = s.UserID
+		pstID, err := strconv.Atoi(r.FormValue("id"))
+
+		if err != nil {
+			panic(err)
+		}
+
+		app.PostID = uint(pstID)
+
+		// reqBody, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 		log.Fatal(err)
+		// }
+
+		// fmt.Printf("%s\n", reqBody)
+		
+		fmt.Println(pstID)
+		fmt.Println(r.FormValue("id"))
+
+		_, errs = ap.appSrv.StoreApplication(app)
 
 		if len(errs) > 0 {
 			panic(errs)
 		}
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
-	} else {
-		
-		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
 
