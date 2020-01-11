@@ -3,25 +3,25 @@ package handler
 import (
 	"fmt"
 	"html/template"
-	"net/http"
 	"io"
+	"net/http"
 
+	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
 	"github.com/amthesonofGod/Notice-Board/post"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // CompanyHandler handles company handler admin requests
 type CompanyHandler struct {
-	tmpl		*template.Template
-	companySrv 	model.CompanyService
-	postSrv		post.PostService
+	tmpl       *template.Template
+	companySrv company.CompanyService
+	postSrv    post.PostService
 }
 
 // NewCompanyHandler initializes and returns new NewCompanyHandler
-func NewCompanyHandler(T *template.Template, CS model.CompanyService, PS post.PostService) *CompanyHandler {
+func NewCompanyHandler(T *template.Template, CS company.CompanyService, PS post.PostService) *CompanyHandler {
 	return &CompanyHandler{tmpl: T, companySrv: CS, postSrv: PS}
 }
 
@@ -49,17 +49,17 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		for _, cmp := range companies {
 			if cmp.Email == email && cmp.Password == password {
 				fmt.Println("authentication successfull! ")
-				
+
 				if errc == http.ErrNoCookie {
 					sID, _ := uuid.NewV4()
 					cookie = &http.Cookie{
-						Name: "session",
+						Name:  "session",
 						Value: sID.String(),
-						Path: "/",
+						Path:  "/",
 					}
 				}
 
@@ -75,18 +75,17 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 				}
 
 				fmt.Println(session.UUID)
-				
+
 				http.SetCookie(w, cookie)
 				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
-				
+
 				break
-			
+
 			} else {
 				fmt.Println("No such Company!")
 			}
 		}
 
-		
 		io.WriteString(w, cookie.String())
 
 	} else {
@@ -96,10 +95,10 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 // CreateAccount handle requests on /cmp-signup-account
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	
+
 	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
-		
+
 		cmp := &entity.Company{}
 		cmp.Name = r.FormValue("companyname")
 		cmp.Email = r.FormValue("companyemail")
@@ -109,7 +108,7 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		companies, _ := ch.companySrv.Companies()
 
 		for _, company := range companies {
-			
+
 			if cmp.Email == company.Email {
 				http.Redirect(w, r, "/cmp", http.StatusSeeOther)
 				fmt.Println("This Email is already in use! ")
@@ -125,10 +124,10 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		if err == http.ErrNoCookie {
 			sID, _ := uuid.NewV4()
-			cookie = &http.Cookie {
-				Name: "session",
+			cookie = &http.Cookie{
+				Name:  "session",
 				Value: sID.String(),
-				Path: "/",
+				Path:  "/",
 			}
 		}
 
@@ -149,7 +148,6 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		http.SetCookie(w, cookie)
 		http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
 
-		
 	} else {
 		ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", nil)
 	}
@@ -168,7 +166,7 @@ func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	posts, _ := ch.postSrv.Posts()
-	
+
 	ch.tmpl.ExecuteTemplate(w, "cmp_home.layout", posts)
 }
 
@@ -182,7 +180,7 @@ func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("logged-in")
 	if err != http.ErrNoCookie {
 		cookie = &http.Cookie{
-			Name: "logged-in",
+			Name:  "logged-in",
 			Value: "0",
 		}
 		// session := data.Session{Uuid: cookie.Value}
@@ -192,4 +190,3 @@ func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	http.Redirect(w, r, "/cmp", 302)
 }
-

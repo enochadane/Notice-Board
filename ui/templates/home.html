@@ -17,6 +17,24 @@
                     {{ end }}
                 </div>
             </div>
+<<<<<<< HEAD
+=======
+            <div class="col-6">
+              <div class="container">
+                  <div class="row">
+                      {{ range . }}
+                      <div class="container-fluid">
+                        <div class="row"> <h4> {{ .Owner }} </h4></div>
+                          <div class="row"> <h4> {{ .Title }} </h4></div>
+                          <div class="row"> <p> {{ .Description}} </p></div>
+                          <div class="row"> <img src="/assets/img/{{ .Image }}" width="200rem" height="200rem"/> </div>
+                      </div>
+                      {{ end }}
+                  </div>
+              </div>
+            </div>
+            <div class="col-md col-sm-0 col-xs-0"></div>
+>>>>>>> 56480e1450127de4cec062eea25b723b5216035f
         </div>
     </div>
   

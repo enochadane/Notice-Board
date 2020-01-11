@@ -10,27 +10,25 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
-	"github.com/amthesonofGod/Notice-Board/model"
-
 )
 
 // CompanyPostHandler handles post handler admin requests
 type CompanyPostHandler struct {
-	tmpl		*template.Template
-	postSrv 	post.PostService
-	companySrv 	model.CompanyService
+	tmpl       *template.Template
+	postSrv    post.PostService
+	companySrv company.CompanyService
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
-func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP model.CompanyService) *CompanyPostHandler {
+func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company.CompanyService) *CompanyPostHandler {
 	return &CompanyPostHandler{tmpl: T, postSrv: PS, companySrv: CP}
 }
 
 // CompanyPosts handle requests on route /admin/cmp-posts
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
-	
 
 	var cookie, cerr = r.Cookie("session")
 	if cerr != nil {
@@ -45,7 +43,7 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 	}
 
 	authorizedPost := []entity.Post{}
-	
+
 	posts, errs := cph.postSrv.Posts()
 	if len(errs) > 0 {
 		panic(errs)
@@ -104,7 +102,6 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		post.Category = r.Form.Get("category")
 
 		fmt.Println(post.Category)
-
 
 		mf, fh, err := r.FormFile("postimg")
 		if err != nil {

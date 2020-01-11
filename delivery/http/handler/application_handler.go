@@ -6,13 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	// "io/ioutil"
-	// "log"
-
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/application"
-	"github.com/amthesonofGod/Notice-Board/model"
+	"github.com/amthesonofGod/Notice-Board/user"
 
 )
 
@@ -20,17 +17,17 @@ import (
 type ApplicationHandler struct {
 	tmpl	*template.Template
 	appSrv	application.ApplicationService
-	userSrv model.UserService
+	userSrv user.UserService
 	postSrv post.PostService
 }
 
 // NewApplicationHandler initializes and returns new ApplicationHandler
-func NewApplicationHandler(T *template.Template, AP application.ApplicationService, US model.UserService, PS post.PostService) *ApplicationHandler {
+func NewApplicationHandler(T *template.Template, AP application.ApplicationService, US user.UserService, PS post.PostService) *ApplicationHandler {
 	return &ApplicationHandler{tmpl: T, appSrv: AP, userSrv: US, postSrv: PS}
 }
 
 // Applications handle requests on route /applications
-func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
+func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie("session")
 
@@ -235,6 +232,9 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
+	} else {
+
+		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
 
@@ -331,4 +331,3 @@ func (ap *ApplicationHandler) ApplicationDelete(w http.ResponseWriter, r *http.R
 
 	http.Redirect(w, r, "/applications", http.StatusSeeOther)
 }
-

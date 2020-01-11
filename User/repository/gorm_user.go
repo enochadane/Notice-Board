@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/model"
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,12 +12,12 @@ type UserGormRepo struct {
 }
 
 // NewUserGormRepo will create a new object of UserGormRepo
-func NewUserGormRepo(db *gorm.DB) model.UserRepository {
+func NewUserGormRepo(db *gorm.DB) user.UserRepository {
 	return &UserGormRepo{conn: db}
 }
 
 // Users returns all users stored in the database
-func (uRepo *UserGormRepo) Users() ([]entity.User, []error) {	
+func (uRepo *UserGormRepo) Users() ([]entity.User, []error) {
 	usrs := []entity.User{}
 	errs := uRepo.conn.Find(&usrs).GetErrors()
 	if len(errs) > 0 {

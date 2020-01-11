@@ -9,7 +9,7 @@ import (
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/request"
-	"github.com/amthesonofGod/Notice-Board/model"
+	"github.com/amthesonofGod/Notice-Board/user"
 
 	// "github.com/satori/go.uuid"
 )
@@ -19,16 +19,16 @@ type RequestHandler struct {
 	tmpl		*template.Template
 	reqSrv		request.RequestService
 	postSrv 	post.PostService
-	userSrv 	model.UserService
+	userSrv 	user.UserService
 }
 
 // NewRequestHandler initializes and returns new RequestHandler
-func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.PostService, US model.UserService) *RequestHandler {
+func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.PostService, US user.UserService) *RequestHandler {
 	return &RequestHandler{tmpl: T, reqSrv: RQ, postSrv: PS, userSrv: US}
 }
 
 // Requests handle requests on route /requests
-func(rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
+func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie("session")
 

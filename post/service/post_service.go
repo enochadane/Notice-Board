@@ -74,37 +74,3 @@ func (ps *PostService) DeletePost(id uint) (*entity.Post, []error) {
 
 	return pst, nil
 }
-
-// // StoreSession persists new session information
-// func (ps *PostService) StoreSession(session *entity.PostSession) (*entity.PostSession, []error) {
-	
-// 	s, errs := ps.postRepo.StoreSession(session)
-
-// 	if len(errs) > 0 {
-// 		return nil, errs
-// 	}
-
-// 	return s, nil
-// }
-
-// // DeleteSession delete a session by its id
-// func (ps *PostService) DeleteSession(uuid string) (*entity.PostSession, []error) {
-	
-// 	s, errs := ps.postRepo.DeleteSession(uuid)
-
-// 	if len(errs) > 0 {
-// 		return nil, errs
-// 	}
-// 	return s, nil
-// }
-
-// // Session returns a session object with a given id
-// func (ps *PostService) Session(uuid string) (*entity.PostSession, []error) {
-
-// 	s, errs := ps.postRepo.Session(uuid)
-
-// 	if len(errs) > 0 {
-// 		return nil, errs
-// 	}
-
-// }
