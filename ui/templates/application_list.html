@@ -2,28 +2,28 @@
       <div class="col-9">
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-              <h2>Menu Categories</h2>
+              <h4>My Applications</h4>
           </div>
           <table class="table table-striped">
               <thead>
                 <tr>
                   <th scope="col">Id</th>
-                  <th scope="col">Phone</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Letter</th>
+                  <th scope="col">Company</th>
+                  <th scope="col">Title</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                   <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
-                {{ range . }}
+                {{ range .UserApplications }}
                 <tr>
                   <td scope="row"> {{ .ID }} </td>
-                  <td> {{ .Phone }} </td>
+                  <td> {{ .FullName }} </td>
                   <td> {{ .Email }} </td>
-                  <td> {{ .Letter }} </td>
-                  <td> <a href="/cmp/posts/update?id={{ .ID }}">Edit</a> </td>
-                  <td> <a href="/cmp/posts/delete?id={{ .ID }}">Delete</a> </td>
+                  <td> {{ .Phone }} </td>
+                  <td> <a href="/user/applications/update?id={{ .ID }}">Edit</a> </td>
+                  <td> <a href="/user/applications/delete?id={{ .ID }}">Delete</a> </td>
                 </tr>
                 {{ end }}
               </tbody>

@@ -1,0 +1,6 @@
+{{ define "request_update.layout" }}
+{{ template "no_jumb_navbar" . }}
+{{ template "side_navbar.content" . }}
+{{ template "request_update.content" . }}
+{{ template "footer" . }}
+{{ end }}

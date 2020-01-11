@@ -47,18 +47,121 @@ func(ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request
 
 	userApplications := []entity.Application{}
 
+	// var pstid uint
 	for _, app := range apps {
 		if s.UserID == app.UserID {
 			userApplications = append(userApplications, app)
+			// pstid = app.PostID
 		}
 	}
 
-	// type MyApplication struct {
-	// 	userApplications []entity.Application
-	// 	cmp.Name		string
+	posts, perr := ap.postSrv.Posts()
+
+	if len(perr) > 0 {
+		panic(perr)
+	}
+
+	appliedOnPosts := []entity.Post{}
+
+	for _, post := range posts {
+		for _, myapps := range userApplications {
+			if myapps.PostID == post.ID && post.Category == "Job" {
+				appliedOnPosts = append(appliedOnPosts, post)
+			}
+		}
+	}
+
+	// tmplData := struct {
+	// 	UserApplications	[]entity.Application
+	// 	Post				*entity.Post
+	// }{userApplications, post}
+
+	m := map[string]interface{}{
+		"UserApplications": userApplications,
+		"Post":   appliedOnPosts,
+	}
+	
+	ap.tmpl.ExecuteTemplate(w, "application_list.layout", m)
+}
+
+// CompanyReceivedApplications handle requests on route /received/applications
+func(ap *ApplicationHandler) CompanyReceivedApplications(w http.ResponseWriter, r *http.Request) {
+
+	// cookie, _ := r.Cookie("session")
+
+	// s, serr := ap.userSrv.Session(cookie.Value)
+
+	// if len(serr) > 0 {
+	// 	panic(serr)
 	// }
 
-	ap.tmpl.ExecuteTemplate(w, "application_list.layout", userApplications)
+	apps, errs := ap.appSrv.Applications()
+	if len(errs) > 0 {
+		panic(errs)
+	}
+
+	userApplications := []entity.Application{}
+
+	// // var pstid uint
+	// for _, app := range apps {
+	// 	if s.UserID == app.UserID {
+	// 		userApplications = append(userApplications, app)
+	// 		// pstid = app.PostID
+	// 	}
+	// }
+
+	posts, perr := ap.postSrv.Posts()
+
+	if len(perr) > 0 {
+		panic(perr)
+	}
+
+	appliedOnPosts := []entity.Post{}
+
+	for _, post := range posts {
+		for _, app := range apps {
+			if app.PostID == post.ID && post.Category == "Job" {
+				userApplications = append(userApplications, app)
+				appliedOnPosts = append(appliedOnPosts, post)
+			}
+		}
+	}
+
+	m := map[string]interface{}{
+		"UserApplications": userApplications,
+		"Post":   appliedOnPosts,
+	}
+	
+	ap.tmpl.ExecuteTemplate(w, "received_applications.layout", m)
+}
+
+//ApplicationDetails handle requests on route /received/applications/details
+func(ap *ApplicationHandler) ApplicationDetails(w http.ResponseWriter, r *http.Request) {
+	
+	if r.Method == http.MethodGet {
+		
+		idRaw := r.URL.Query().Get("id")
+		id, err := strconv.Atoi(idRaw)
+
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(id)
+
+		app, errs := ap.appSrv.Application(uint(id))
+
+		if len(errs) > 0 {
+			panic(errs)
+		}
+
+		fmt.Println(app)
+
+		ap.tmpl.ExecuteTemplate(w, "received_applications_detail.layout", app)
+	} else {
+		
+		ap.tmpl.ExecuteTemplate(w, "received_applications_detail.layout", nil)
+	}
 }
 
 // Apply hanlde requests on route /job/apply
@@ -81,35 +184,11 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 			panic(errs)
 		}
 
-		// values := url.Values{}
-		// values.Add("pstid", idRaw)
-
-		// appForm := struct {
-		// 	Values	url.Values
-		// 	Post	*entity.Post
-		// }{
-		// 	Values:	values,
-		// 	Post:	post,
-		// }
-
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", post)
 
 	} 
 
 	if r.Method == http.MethodPost {
-
-		// // Parse the form data
-		// err := r.ParseForm()
-		// if err != nil {
-		// 	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		// 	return
-		// }
-
-		// pstID, err := strconv.Atoi(r.FormValue("pstid"))
-
-		// if err != nil {
-		// 	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		// }
 
 		app := &entity.Application{}
 		app.FullName = r.FormValue("fullname")
@@ -159,8 +238,8 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ApplicationsUpdate handle requests on /applications/update
-func (ap *ApplicationHandler) ApplicationsUpdate(w http.ResponseWriter, r *http.Request) {
+// ApplicationsUpdate handle requests on /user/applications/update
+func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
@@ -179,39 +258,50 @@ func (ap *ApplicationHandler) ApplicationsUpdate(w http.ResponseWriter, r *http.
 			panic(errs)
 		}
 
-		ap.tmpl.ExecuteTemplate(w, "admin.categ.update.layout", app)
+		ap.tmpl.ExecuteTemplate(w, "application_update.layout", app)
 
 	} else if r.Method == http.MethodPost {
 
 		appc := &entity.Application{}
 		id, _ := strconv.Atoi(r.FormValue("id"))
 		appc.ID = uint(id)
+
+		userid, _ := strconv.Atoi(r.FormValue("userid"))
+		postid, _ := strconv.Atoi(r.FormValue("postid"))
+
+		appc.UserID = uint(userid)
+		appc.PostID = uint(postid)
+
+		fmt.Println(appc.UserID)
+		fmt.Println(appc.PostID)
+
 		appc.FullName = r.FormValue("fullname")
 		appc.Email = r.FormValue("email")
 		appc.Phone = r.FormValue("phone")
 		appc.Letter = r.FormValue("letter")
-		// appc.Resume = r.FormValue("resume")
 
-		// mf, _, err := r.FormFile("resume")
+		appc.Resume = r.FormValue("oldresume")
 
-		// if err != nil {
-		// 	panic(err)
-		// }
+		mf, _, err := r.FormFile("resume")
 
-		// defer mf.Close()
+		if err != nil {
+			panic(err)
+		}
 
-		// writeFile(&mf, ctg.Image)
+		defer mf.Close()
 
-		// _, errs := ach.categorySrv.UpdateCategory(ctg)
+		writeFile(&mf, appc.Resume)
 
-		// if len(errs) > 0 {
-		// 	panic(errs)
-		// }
+		_, errs := ap.appSrv.UpdateApplication(appc)
 
-		http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
+		if len(errs) > 0 {
+			panic(errs)
+		}
+
+		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 
 	} else {
-		http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
+		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	}
 
 }

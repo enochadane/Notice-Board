@@ -1,6 +1,8 @@
-{{ define "received_applications.layout" }}
+{{ define "received_applications_detail.layout" }}
+
 {{ template "no_jumb_navbar" . }}
 {{ template "cmp_side_navbar.content" . }}
-{{ template "received_applications.content" . }}
+{{ template "received_applications_detail.content" . }}
 {{ template "footer" . }}
+
 {{ end }}

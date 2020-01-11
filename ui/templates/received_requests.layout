@@ -2,7 +2,7 @@
 
 {{ template "no_jumb_navbar" . }}
 {{ template "cmp_side_navbar.content" . }}
-{{ template "received_requests.content " . }}
+{{ template "received_requests.content" . }}
 {{ template "footer" . }}
 
 {{ end }}
