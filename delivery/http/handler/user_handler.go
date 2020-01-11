@@ -1,28 +1,53 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
 
 	"github.com/amthesonofGod/Notice-Board/User"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	uuid "github.com/satori/go.uuid"
 
+	"github.com/amthesonofGod/Notice-Board/session"
+
 	"github.com/amthesonofGod/Notice-Board/post"
+	"github.com/amthesonofGod/Notice-Board/rtoken"
 )
 
 // UserHandler handles user requests
 type UserHandler struct {
-	tmpl    *template.Template
-	userSrv User.UserService
-	postSrv post.PostService
+	tmpl           *template.Template
+	userSrv        User.UserService
+	postSrv        post.PostService
+	sessionService User.SessionService
+	userSess       *entity.UserSession
+	loggedInUser   *entity.User
+	//csrfSignKey    []byte
 }
 
+type contextKey string
+
+var ctxUserSessionKey = contextKey("signed_in_user_session")
+
 // NewUserHandler initializes and returns new NewUserHandler
-func NewUserHandler(T *template.Template, US User.UserService, PS post.PostService) *UserHandler {
-	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS}
+func NewUserHandler(T *template.Template, US User.UserService, PS post.PostService, sessServ User.SessionService, usrSess *entity.UserSession) *UserHandler {
+	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS, sessionService: sessServ, userSess: usrSess}
+}
+
+// Authenticated checks if a user is authenticated to access a given route
+func (uh *UserHandler) Authenticated(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		ok := uh.loggedIn(r)
+		if !ok {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		ctx := context.WithValue(r.Context(), ctxUserSessionKey, uh.userSess)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
+	return http.HandlerFunc(fn)
 }
 
 // Index handle requests on /
@@ -40,8 +65,6 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 // Login handle requests on /login
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
-	cookie, err := r.Cookie("session")
-
 	if r.Method == http.MethodPost {
 
 		email := r.FormValue("useremail")
@@ -53,26 +76,27 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 			if email == user.Email && password == user.Password {
 				fmt.Println("authentication successfull! ")
 
-				if err == http.ErrNoCookie {
-					sID, _ := uuid.NewV4()
-					cookie = &http.Cookie{
-						Name:  "session",
-						Value: sID.String(),
-						Path:  "/",
-					}
-				}
+				// if err == http.ErrNoCookie {
+				// 	sID, _ := uuid.NewV4()
+				// 	cookie = &http.Cookie{
+				// 		Name:  "session",
+				// 		Value: sID.String(),
+				// 		Path:  "/",
+				// 	}
+				// }
 
-				session := &entity.UserSession{}
-				session.UUID = cookie.Value
-				session.UserID = user.ID
-
-				_, errs := uh.userSrv.StoreSession(session)
+				usr := &user
+				uh.loggedInUser = usr
+				claims := rtoken.Claims(usr.Email, uh.userSess.Expires)
+				session.Create(claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
+				newSess, errs := uh.sessionService.StoreSession(uh.userSess)
 
 				if len(errs) > 0 {
 					panic(errs)
+
 				}
 
-				http.SetCookie(w, cookie)
+				uh.userSess = newSess
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
 				break
 
@@ -81,11 +105,27 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		io.WriteString(w, cookie.String())
+		//io.WriteString(w, cookie.String())
 
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
+}
+
+func (uh *UserHandler) loggedIn(r *http.Request) bool {
+	if uh.userSess == nil {
+		return false
+	}
+	userSess := uh.userSess
+	c, err := r.Cookie(userSess.UUID)
+	if err != nil {
+		return false
+	}
+	ok, err := session.Valid(c.Value, userSess.SigningKey)
+	if !ok || (err != nil) {
+		return false
+	}
+	return true
 }
 
 // CreateAccount handle requests on /signup-account
