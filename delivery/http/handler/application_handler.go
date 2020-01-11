@@ -308,7 +308,7 @@ func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.R
 
 }
 
-// ApplicationDelete handle requests on route /applications/delete
+// ApplicationDelete handle requests on route /user/applications/delete
 func (ap *ApplicationHandler) ApplicationDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -329,6 +329,6 @@ func (ap *ApplicationHandler) ApplicationDelete(w http.ResponseWriter, r *http.R
 
 	}
 
-	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
+	http.Redirect(w, r, "/applications", http.StatusSeeOther)
 }
 

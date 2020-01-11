@@ -230,7 +230,7 @@ func (rqh *RequestHandler) RequestUpdate(w http.ResponseWriter, r *http.Request)
 
 }
 
-// RequestDelete handle requests on route /requests/delete
+// RequestDelete handle requests on route /user/requests/delete
 func (rqh *RequestHandler) RequestDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -251,5 +251,5 @@ func (rqh *RequestHandler) RequestDelete(w http.ResponseWriter, r *http.Request)
 
 	}
 
-	http.Redirect(w, r, "/admin/categories", http.StatusSeeOther)
+	http.Redirect(w, r, "/requests", http.StatusSeeOther)
 }

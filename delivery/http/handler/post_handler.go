@@ -135,7 +135,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	}
 }
 
-// CompanyPostsUpdate handle requests on /cmp/posts/update
+// CompanyPostUpdate handle requests on /cmp/posts/update
 func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
@@ -200,8 +200,8 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 
 }
 
-// CompanyPostsDelete handle requests on route /admin/posts/delete
-func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http.Request) {
+// CompanyPostDelete handle requests on route /cmp/posts/delete
+func (cph *CompanyPostHandler) CompanyPostDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
@@ -221,7 +221,7 @@ func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http
 
 	}
 
-	http.Redirect(w, r, "/cmp_home", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 }
 
 func writeFile(mf *multipart.File, fname string) {
