@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
-	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -26,6 +26,8 @@ import (
 	reqServ "github.com/amthesonofGod/Notice-Board/request/service"
 
 	"github.com/amthesonofGod/Notice-Board/delivery/http/handler"
+
+	"github.com/amthesonofGod/Notice-Board/rtoken"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -49,9 +51,10 @@ func createTables(dbconn *gorm.DB) []error {
 
 	// dbconn.DropTableIfExists(&entity.Session{})
 	// errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
-	errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
-
-	if errs != nil {
+	errs := dbconn.CreateTable(&entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
+	er := dbconn.CreateTable(&entity.UserSession{}).GetErrors()
+	r := dbconn.CreateTable(&entity.CompanySession{}).GetErrors()
+	if errs != nil || er != nil || r != nil {
 		return errs
 	}
 
@@ -79,6 +82,12 @@ func main() {
 	// 	panic(err)
 	// }
 
+	userSessionRepo := repository.NewSessionGormRepo(dbconn)
+	userSessionsrv := service.NewSessionService(userSessionRepo)
+
+	companySessionRepo := repositoryCamp.NewSessionGormRepoCamp(dbconn)
+	companySessionSrv := serviceCamp.NewSessionServiceCamp(companySessionRepo)
+
 	companyRepo := repositoryCamp.NewCompanyGormRepo(dbconn)
 	companySrv := serviceCamp.NewCompanyService(companyRepo)
 
@@ -98,19 +107,25 @@ func main() {
 
 	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, postSrv)
 
+	//(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession)
+	sessCamp := configSessCamp()
+
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
+	sess := configSess()
 
-	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv)
+	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess)
 
-	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv)
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
 
-	r := mux.NewRouter()
+	//r := mux.NewRouter()
+
+	r := http.NewServeMux()
 
 	// Server CSS, JS & Images Statically.
-	// fs := http.FileServer(http.Dir("../../ui/assets"))
-	// r.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	fs := http.FileServer(http.Dir("../../ui/assets"))
+	r.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
-	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
+	//r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
 
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
@@ -136,3 +151,34 @@ func main() {
 	http.ListenAndServe(":8080", r)
 }
 
+func configSess() *entity.UserSession {
+	tokenExpires := time.Now().Add(time.Minute * 30).Unix()
+	sessionID := rtoken.GenerateRandomID(32)
+	signingString, err := rtoken.GenerateRandomString(32)
+	if err != nil {
+		panic(err)
+	}
+	signingKey := []byte(signingString)
+
+	return &entity.UserSession{
+		Expires:    tokenExpires,
+		SigningKey: signingKey,
+		UUID:       sessionID,
+	}
+}
+
+func configSessCamp() *entity.CompanySession {
+	tokenExpires := time.Now().Add(time.Minute * 30).Unix()
+	sessionID := rtoken.GenerateRandomID(32)
+	signingString, err := rtoken.GenerateRandomString(32)
+	if err != nil {
+		panic(err)
+	}
+	signingKey := []byte(signingString)
+
+	return &entity.CompanySession{
+		Expires:    tokenExpires,
+		SigningKey: signingKey,
+		UUID:       sessionID,
+	}
+}

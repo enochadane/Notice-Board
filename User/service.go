@@ -13,3 +13,10 @@ type UserService interface {
 	Session(uuid string) (*entity.UserSession, []error)
 	DeleteSession(uuid string) (*entity.UserSession, []error)
 }
+
+//SessionService ...
+type SessionService interface {
+	Session(sessionID string) (*entity.UserSession, []error)
+	StoreSession(session *entity.UserSession) (*entity.UserSession, []error)
+	DeleteSession(sessionID string) (*entity.UserSession, []error)
+}
