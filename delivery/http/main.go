@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -118,13 +117,15 @@ func main() {
 
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
 
-	r := mux.NewRouter()
+	//r := mux.NewRouter()
+
+	r := http.NewServeMux()
 
 	// Server CSS, JS & Images Statically.
-	// fs := http.FileServer(http.Dir("../../ui/assets"))
-	// r.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	fs := http.FileServer(http.Dir("../../ui/assets"))
+	r.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
-	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
+	//r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
 
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
