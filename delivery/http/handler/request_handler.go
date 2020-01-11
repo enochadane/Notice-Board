@@ -90,12 +90,6 @@ func(rqh *RequestHandler) CompanyReceivedRequests(w http.ResponseWriter, r *http
 
 	userRequests := []entity.Request{}
 
-	// for _, req := range reqs {
-	// 	if s.UserID == req.UserID {
-	// 		userRequests = append(userRequests, req)
-	// 	}
-	// }
-
 	posts, errs := rqh.postSrv.Posts()
 	if len(errs) > 0 {
 		panic(errs)

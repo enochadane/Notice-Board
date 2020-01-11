@@ -282,13 +282,15 @@ func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.R
 
 		appc.Resume = r.FormValue("oldresume")
 
-		mf, _, err := r.FormFile("resume")
+		mf, fh, err := r.FormFile("resume")
 
 		if err != nil {
 			panic(err)
 		}
 
 		defer mf.Close()
+
+		appc.Resume = fh.Filename
 
 		writeFile(&mf, appc.Resume)
 

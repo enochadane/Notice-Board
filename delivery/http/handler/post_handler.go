@@ -174,13 +174,15 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 		pst.Image = r.FormValue("image")
 		pst.Category = r.Form.Get("category")
 
-		mf, _, err := r.FormFile("postimg")
+		mf, fh, err := r.FormFile("postimg")
 
 		if err != nil {
 			panic(err)
 		}
 
 		defer mf.Close()
+
+		pst.Image = fh.Filename
 
 		writeFile(&mf, pst.Image)
 
