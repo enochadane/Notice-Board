@@ -34,7 +34,7 @@ func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
 	s, errs := rqh.userSrv.Session(cookie.Value)
 	if len(errs) > 0 {
-		panic((errs))
+		panic(errs)
 	}
 
 	reqs, errs := rqh.reqSrv.Requests()
