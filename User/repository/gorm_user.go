@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/amthesonofGod/Notice-Board/User"
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/jinzhu/gorm"
 )
@@ -12,7 +12,7 @@ type UserGormRepo struct {
 }
 
 // NewUserGormRepo will create a new object of UserGormRepo
-func NewUserGormRepo(db *gorm.DB) User.UserRepository {
+func NewUserGormRepo(db *gorm.DB) user.UserRepository {
 	return &UserGormRepo{conn: db}
 }
 

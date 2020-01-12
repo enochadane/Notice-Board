@@ -1,17 +1,17 @@
 package service
 
 import (
-	"github.com/amthesonofGod/Notice-Board/User"
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 // SessionServiceImpl implements user.SessionService interface
 type SessionServiceImpl struct {
-	sessionRepo User.SessionRepository
+	sessionRepo user.SessionRepository
 }
 
 // NewSessionService  returns a new SessionService object
-func NewSessionService(sessRepository User.SessionRepository) User.SessionService {
+func NewSessionService(sessRepository user.SessionRepository) user.SessionService {
 	return &SessionServiceImpl{sessionRepo: sessRepository}
 }
 

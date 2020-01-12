@@ -16,10 +16,10 @@ type Company struct {
 // CompanySession represents company sessions
 type CompanySession struct {
 	ID         uint
+	CompanyID  uint
 	UUID       string `gorm:"type:varchar(255);not null"`
 	Expires    int64  `gorm:"type:varchar(255);not null"`
 	SigningKey []byte `gorm:"type:varchar(255);not null"`
-	CompanyID  uint
 }
 
 // Session represents sessions
@@ -39,6 +39,13 @@ type Post struct {
 	Category    string `gorm:"type:varchar(255);not null"`
 	CompanyID   uint
 	Owner       string `gorm:"type:varchar(255);not null"`
+}
+
+// PostSession represents post sessions
+type PostSession struct {
+	gorm.Model
+	UUID	string
+	PostID	uint
 }
 
 // User represents Users

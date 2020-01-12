@@ -1,5 +1,6 @@
 {{ define "cmp_post.layout" }}
-{{ template "cmp_navbar" . }}
+{{ template "no_jumb_navbar" . }}
+{{ template "cmp_side_navbar.content" . }}
 {{ template "cmp_post.content" . }}
 {{ template "footer" . }}
 {{ end }}

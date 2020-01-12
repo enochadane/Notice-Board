@@ -31,9 +31,10 @@ func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 
 	var cookie, cerr = r.Cookie("session")
-	if cerr == nil {
-		cookievalue := cookie.Value
-		fmt.Println(cookievalue)
+	if cerr != nil {
+		fmt.Println("no cookie")
+		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
+		return
 	}
 
 	s, serr := cph.companySrv.Session(cookie.Value)
@@ -53,11 +54,11 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	fmt.Println("All posts")
-	fmt.Println(posts)
+	// fmt.Println("All posts")
+	// fmt.Println(posts)
 
-	fmt.Println("Current Post")
-	fmt.Println(authorizedPost)
+	// fmt.Println("Current Post")
+	// fmt.Println(authorizedPost)
 	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
 }
 
@@ -131,8 +132,8 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	}
 }
 
-// CompanyPostsUpdate handle requests on /admin/posts/update
-func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http.Request) {
+// CompanyPostUpdate handle requests on /cmp/posts/update
+func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
@@ -149,43 +150,55 @@ func (cph *CompanyPostHandler) CompanyPostsUpdate(w http.ResponseWriter, r *http
 			panic(errs)
 		}
 
-		cph.tmpl.ExecuteTemplate(w, "admin.categ.update.layout", post)
+		cph.tmpl.ExecuteTemplate(w, "post_update.layout", post)
 
 	} else if r.Method == http.MethodPost {
 
-		pst := entity.Post{}
-		// pst.ID, _ = strconv.Atoi(r.FormValue("id"))
-		pst.Title = r.FormValue("name")
+		pst := &entity.Post{}
+
+		postid, _ := strconv.Atoi(r.FormValue("id"))
+
+		companyid, _ := strconv.Atoi(r.FormValue("companyid"))
+
+		pst.ID = uint(postid)
+
+		pst.CompanyID = uint(companyid)
+
+		pst.Owner = r.FormValue("owner")
+
+		pst.Title = r.FormValue("title")
 		pst.Description = r.FormValue("description")
-		// pst.Image = r.FormValue("image")
-		// pst.Category = r.Form.Get("category")
+		pst.Image = r.FormValue("image")
+		pst.Category = r.Form.Get("category")
 
-		// mf, _, err := r.FormFile("postimg")
+		mf, fh, err := r.FormFile("postimg")
 
-		// if err != nil {
-		// 	panic(err)
-		// }
+		if err != nil {
+			panic(err)
+		}
 
-		// defer mf.Close()
+		defer mf.Close()
 
-		// writeFile(&mf, pst.Image)
+		pst.Image = fh.Filename
 
-		// err = cph.postSrv.UpdatePost(pst)
+		writeFile(&mf, pst.Image)
 
-		// if err != nil {
-		// 	panic(err)
-		// }
+		_, errs := cph.postSrv.UpdatePost(pst)
 
-		http.Redirect(w, r, "/cmp_home", http.StatusSeeOther)
+		if len(errs) > 0 {
+			panic(errs)
+		}
+
+		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 
 	} else {
-		http.Redirect(w, r, "/cmp_home", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 	}
 
 }
 
-// CompanyPostsDelete handle requests on route /admin/posts/delete
-func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http.Request) {
+// CompanyPostDelete handle requests on route /cmp/posts/delete
+func (cph *CompanyPostHandler) CompanyPostDelete(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
@@ -205,7 +218,7 @@ func (cph *CompanyPostHandler) CompanyPostsDelete(w http.ResponseWriter, r *http
 
 	}
 
-	http.Redirect(w, r, "/cmp_home", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 }
 
 func writeFile(mf *multipart.File, fname string) {

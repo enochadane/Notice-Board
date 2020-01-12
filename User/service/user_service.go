@@ -1,17 +1,17 @@
 package service
 
 import (
-	"github.com/amthesonofGod/Notice-Board/User"
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
 )
 
 // UserService implements model.UserRepository interface
 type UserService struct {
-	userRepo User.UserRepository
+	userRepo user.UserRepository
 }
 
 // NewUserService will create new UserService object
-func NewUserService(UserRepos User.UserRepository) User.UserService {
+func NewUserService(UserRepos user.UserRepository) user.UserService {
 	return &UserService{userRepo: UserRepos}
 }
 

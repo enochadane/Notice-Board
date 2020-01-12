@@ -74,4 +74,3 @@ func (ps *PostService) DeletePost(id uint) (*entity.Post, []error) {
 
 	return pst, nil
 }
-

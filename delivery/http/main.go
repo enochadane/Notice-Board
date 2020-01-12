@@ -10,8 +10,8 @@ import (
 
 	"github.com/amthesonofGod/Notice-Board/entity"
 
-	repository "github.com/amthesonofGod/Notice-Board/User/repository"
-	service "github.com/amthesonofGod/Notice-Board/User/service"
+	repository "github.com/amthesonofGod/Notice-Board/user/repository"
+	service "github.com/amthesonofGod/Notice-Board/user/service"
 
 	repositoryCamp "github.com/amthesonofGod/Notice-Board/company/repositoryCamp"
 	serviceCamp "github.com/amthesonofGod/Notice-Board/company/serviceCamp"
@@ -37,9 +37,9 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "kingo"
+	password = "godisgood"
 	dbname   = "noticeboard"
-)
+) 
 
 var tmpl *template.Template
 
@@ -49,12 +49,11 @@ func init() {
 
 func createTables(dbconn *gorm.DB) []error {
 
-	// dbconn.DropTableIfExists(&entity.Session{})
-	// errs := dbconn.CreateTable(&entity.Application{}, &entity.Request{}).GetErrors()
-	errs := dbconn.CreateTable(&entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
-	er := dbconn.CreateTable(&entity.UserSession{}).GetErrors()
-	r := dbconn.CreateTable(&entity.CompanySession{}).GetErrors()
-	if errs != nil || er != nil || r != nil {
+	// dbconn.DropTableIfExists(&entity.CompanySession{}, &entity.UserSession{})
+	// errs := dbconn.CreateTable( &entity.Request{}, &entity.Application{}).GetErrors()
+	errs := dbconn.CreateTable(&entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
+
+	if errs != nil {
 		return errs
 	}
 
@@ -103,9 +102,10 @@ func main() {
 	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
 	requestSrv := reqServ.NewRequestService(requestRepo)
 
-	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv)
 
-	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, postSrv)
+	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv)
+
+	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
 
 	//(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession)
 	sessCamp := configSessCamp()
@@ -141,12 +141,21 @@ func main() {
 
 	r.HandleFunc("/admin/posts/new", postHandler.CompanyPostsNew)
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
+	r.HandleFunc("/cmp/posts/update", postHandler.CompanyPostUpdate)
+	r.HandleFunc("/cmp/posts/delete", postHandler.CompanyPostDelete)
 
 	r.HandleFunc("/job/apply", applicationHandler.Apply)
-	r.HandleFunc("/applicatons", applicationHandler.Applications)
+	r.HandleFunc("/applications", applicationHandler.Applications)
+	r.HandleFunc("/received/applications", applicationHandler.CompanyReceivedApplications)
+	r.HandleFunc("/received/applications/details", applicationHandler.ApplicationDetails)
+	r.HandleFunc("/user/applications/update", applicationHandler.ApplicationUpdate)
+	r.HandleFunc("/user/applications/delete", applicationHandler.ApplicationDelete)
 
 	r.HandleFunc("/event/join", requestHandler.Join)
 	r.HandleFunc("/requests", requestHandler.Requests)
+	r.HandleFunc("/received/requests", requestHandler.CompanyReceivedRequests)
+	r.HandleFunc("/user/requests/update", requestHandler.RequestUpdate)
+	r.HandleFunc("/user/requests/delete", requestHandler.RequestDelete)
 
 	http.ListenAndServe(":8080", r)
 }

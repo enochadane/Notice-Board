@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/amthesonofGod/Notice-Board/User"
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/jinzhu/gorm"
 )
@@ -12,7 +12,7 @@ type SessionGormRepo struct {
 }
 
 // NewSessionGormRepo  returns a new SessionGormRepo object
-func NewSessionGormRepo(db *gorm.DB) User.SessionRepository {
+func NewSessionGormRepo(db *gorm.DB) user.SessionRepository {
 	return &SessionGormRepo{conn: db}
 }
 

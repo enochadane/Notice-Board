@@ -6,22 +6,24 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/amthesonofGod/Notice-Board/User"
+	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/amthesonofGod/Notice-Board/session"
 
 	"github.com/amthesonofGod/Notice-Board/post"
-	"github.com/amthesonofGod/Notice-Board/rtoken"
+	// "github.com/amthesonofGod/Notice-Board/rtoken"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserHandler handles user requests
 type UserHandler struct {
 	tmpl           *template.Template
-	userSrv        User.UserService
+	userSrv        user.UserService
 	postSrv        post.PostService
-	sessionService User.SessionService
+	sessionService user.SessionService
 	userSess       *entity.UserSession
 	loggedInUser   *entity.User
 	//csrfSignKey    []byte
@@ -32,7 +34,7 @@ type contextKey string
 var ctxUserSessionKey = contextKey("signed_in_user_session")
 
 // NewUserHandler initializes and returns new NewUserHandler
-func NewUserHandler(T *template.Template, US User.UserService, PS post.PostService, sessServ User.SessionService, usrSess *entity.UserSession) *UserHandler {
+func NewUserHandler(T *template.Template, US user.UserService, PS post.PostService, sessServ user.SessionService, usrSess *entity.UserSession) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS, sessionService: sessServ, userSess: usrSess}
 }
 
@@ -62,48 +64,103 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func CheckPasswordHash(password, hash string) bool {
+    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+    return err == nil
+}
+
 // Login handle requests on /login
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+
+	cookie, errc := r.Cookie("session")
 
 	if r.Method == http.MethodPost {
 
 		email := r.FormValue("useremail")
 		password := r.FormValue("userpassword")
-
 		users, _ := uh.userSrv.Users()
 
+		
 		for _, user := range users {
-			if email == user.Email && password == user.Password {
-				fmt.Println("authentication successfull! ")
+			if email == user.Email {
+				err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+				if err == bcrypt.ErrMismatchedHashAndPassword {
+					fmt.Println("Your email address or password is wrong")
+					return
+				}
 
-				// if err == http.ErrNoCookie {
-				// 	sID, _ := uuid.NewV4()
-				// 	cookie = &http.Cookie{
-				// 		Name:  "session",
-				// 		Value: sID.String(),
-				// 		Path:  "/",
-				// 	}
-				// }
+				// match := CheckPasswordHash(password, user.Password)
+				// fmt.Println("Match:   ", match)
 
-				usr := &user
-				uh.loggedInUser = usr
-				claims := rtoken.Claims(usr.Email, uh.userSess.Expires)
-				session.Create(claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
-				newSess, errs := uh.sessionService.StoreSession(uh.userSess)
+				if errc == http.ErrNoCookie {
+					sID, _ := uuid.NewV4()
+					cookie = &http.Cookie{
+						Name:  "session",
+						Value: sID.String(),
+						Path:  "/",
+					}
+				}
+
+				session := &entity.UserSession{}
+				session.UUID = cookie.Value
+				session.UserID = user.ID
+
+				_, errs := uh.userSrv.StoreSession(session)
 
 				if len(errs) > 0 {
 					panic(errs)
-
 				}
 
-				uh.userSess = newSess
+				fmt.Println(user.Password)
+				fmt.Println(password)
+
+				fmt.Println("authentication successfull!")
+
+				http.SetCookie(w, cookie)
+				fmt.Println(cookie.Value)
 				http.Redirect(w, r, "/home", http.StatusSeeOther)
 				break
-
 			} else {
-				fmt.Println("No such user!")
+				fmt.Println("user not found")
+				// http.Redirect(w, r, "/", http.StatusSeeOther)
 			}
 		}
+
+		// for _, user := range users {
+		// 	if email == user.Email && password == user.Password {
+		// 		fmt.Println("authentication successfull! ")
+
+		// 		if err == http.ErrNoCookie {
+		// 			sID, _ := uuid.NewV4()
+		// 			cookie = &http.Cookie{
+		// 				Name:  "session",
+		// 				Value: sID.String(),
+		// 				Path:  "/",
+		// 			}
+		// 		}
+
+		// 		usr := &user
+		// 		uh.loggedInUser = usr
+		// 		claims := rtoken.Claims(usr.Email, uh.userSess.Expires)
+		// 		session.Create(claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
+		// 		newSess, errs := uh.sessionService.StoreSession(uh.userSess)
+
+		// 		if len(errs) > 0 {
+		// 			panic(errs)
+
+		// 		}
+
+		// 		uh.userSess = newSess
+
+				
+		// 		http.SetCookie(w, cookie)
+		// 		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		// 		break
+
+		// 	} else {
+		// 		fmt.Println("No such user!")
+		// 	}
+		// }
 
 		//io.WriteString(w, cookie.String())
 
@@ -131,13 +188,14 @@ func (uh *UserHandler) loggedIn(r *http.Request) bool {
 // CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
-	cookie, err := r.Cookie("session")
+	cookie, errc := r.Cookie("session")
+
 	if r.Method == http.MethodPost {
 
 		usr := &entity.User{}
 		usr.Name = r.FormValue("username")
 		usr.Email = r.FormValue("useremail")
-		usr.Password = r.FormValue("userpassword")
+		password := r.FormValue("userpassword")
 		// confirmpass := r.FormValue("confirmPassword")
 
 		users, _ := uh.userSrv.Users()
@@ -151,13 +209,26 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+		if err != nil {
+			// singnUpForm.VErrors.Add("password", "Password Could not be stored")
+			// uh.tmpl.ExecuteTemplate(w, "signup.layout", singnUpForm)
+			panic(err)
+			return
+		}
+
+		
+		usr.Password = string(hashedPassword)
+
+		fmt.Println(usr.Password)
+
 		_, errs := uh.userSrv.StoreUser(usr)
 
 		if len(errs) > 0 {
 			panic(errs)
 		}
 
-		if err == http.ErrNoCookie {
+		if errc == http.ErrNoCookie {
 			sID, _ := uuid.NewV4()
 			cookie = &http.Cookie{
 				Name:  "session",
@@ -204,20 +275,10 @@ func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 	uh.tmpl.ExecuteTemplate(w, "home.layout", posts)
 }
 
-// Logout Logs the user out
+// Logout hanldes the POST /logout requests
 func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-
-	// get cookie
-	cookie, err := r.Cookie("session")
-
-	if err != http.ErrNoCookie {
-		_, errs := uh.userSrv.DeleteSession(cookie.Value)
-		// session.DeleteSession
-		if len(errs) > 0 {
-			panic(errs)
-		}
-	}
-
-	http.SetCookie(w, cookie)
-	http.Redirect(w, r, "/", 302)
+	// userSess, _ := r.Context().Value(ctxUserSessionKey).(*entity.Session)
+	// session.Remove(userSess.UUID, w)
+	// uh.sessionService.DeleteSession(userSess.UUID)
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
 }
