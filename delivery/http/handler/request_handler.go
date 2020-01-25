@@ -155,6 +155,8 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
 		req.PostID = uint(pstID)
 
+		fmt.Println(pstID)
+
 		_, errs = rqh.reqSrv.StoreRequest(req)
 
 		if len(errs) > 0 {
@@ -162,10 +164,6 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/requests", http.StatusSeeOther)
-
-	} else {
-
-		rqh.tmpl.ExecuteTemplate(w, "user_request.layout", nil)
 
 	}
 }

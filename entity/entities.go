@@ -7,9 +7,9 @@ import (
 // Company represents Companies
 type Company struct {
 	gorm.Model
-	Name     string `gorm:"type:varchar(255);not null"`
-	Email    string `gorm:"type:varchar(255);not null"`
-	Password string `gorm:"type:varchar(255);not null"`
+	Name     string `json:"name" gorm:"type:varchar(255);not null"`
+	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
+	Password string `json:"password" gorm:"type:varchar(255);not null"`
 	Posts    []Post
 }
 
@@ -22,38 +22,23 @@ type CompanySession struct {
 	SigningKey []byte `gorm:"type:varchar(255);not null"`
 }
 
-// Session represents sessions
-// type Session struct {
-// 	ID         uint
-// 	UUID       string `gorm:"type:varchar(255);not null"`
-// 	Expires    int64  `gorm:"type:varchar(255);not null"`
-// 	SigningKey []byte `gorm:"type:varchar(255);not null"`
-// }
-
 // Post represents Posts
 type Post struct {
 	gorm.Model
-	Title       string `gorm:"type:varchar(255);not null"`
-	Description string
+	Title       string `json:"title" gorm:"type:varchar(255);not null"`
+	Description string `json:"description"`
 	Image       string `gorm:"type:varchar(255)"`
-	Category    string `gorm:"type:varchar(255);not null"`
+	Category    string `json:"category" gorm:"type:varchar(255);not null"`
 	CompanyID   uint
-	Owner       string `gorm:"type:varchar(255);not null"`
-}
-
-// PostSession represents post sessions
-type PostSession struct {
-	gorm.Model
-	UUID	string
-	PostID	uint
+	Owner       string `json:"owner" gorm:"type:varchar(255);not null"`
 }
 
 // User represents Users
 type User struct {
 	gorm.Model
-	Name     string `gorm:"type:varchar(255);not null"`
-	Email    string `gorm:"type:varchar(255);not null"`
-	Password string `gorm:"type:varchar(255);not null"`
+	Name     string `json:"name" gorm:"type:varchar(255);not null"`
+	Email    string `json:"email" gorm:"type:varchar(255);not null"`
+	Password string `json:"password" gorm:"type:varchar(255);not null"`
 }
 
 // UserSession represents user sessions
@@ -68,11 +53,11 @@ type UserSession struct {
 // Application represents job applications forwarded by application users
 type Application struct {
 	gorm.Model
-	FullName string
-	Email    string
-	Phone    string
-	Letter   string
-	Resume   string
+	FullName string `json:"fullname" gorm:"type:varchar(255);not null"`
+	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
+	Phone    string `json:"phone" gorm:"type:varchar(255);not null; unique"`
+	Letter   string `json:"letter"`
+	Resume   string `json:"resume"`
 	PostID   uint
 	UserID   uint
 }
@@ -80,9 +65,9 @@ type Application struct {
 // Request represents event join requests forwarded by application users
 type Request struct {
 	gorm.Model
-	FullName string
-	Email    string
-	Phone    string
+	FullName string `json:"fullname" gorm:"type:varchar(255);not null"`
+	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
+	Phone    string `json:"phone" gorm:"type:varchar(255);not null; unique"`
 	PostID   uint
 	UserID   uint
 }

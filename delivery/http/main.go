@@ -131,6 +131,7 @@ func main() {
 	r.HandleFunc("/login", usrHandler.Login)
 	r.HandleFunc("/signup-account", usrHandler.CreateAccount)
 	r.HandleFunc("/home", usrHandler.Home)
+	r.HandleFunc("/logout", usrHandler.Logout)
 
 	r.HandleFunc("/cmp", cmpHandler.SignInUp)
 	r.HandleFunc("/cmp-login", cmpHandler.Login)
@@ -138,6 +139,7 @@ func main() {
 	r.HandleFunc("/cmp-home", cmpHandler.Home)
 	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
 	r.HandleFunc("/admin", cmpHandler.Admin)
+	r.HandleFunc("/cmp-logout",cmpHandler.Logout)
 
 	r.HandleFunc("/admin/posts/new", postHandler.CompanyPostsNew)
 	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)

@@ -214,6 +214,8 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		}
 
 		app.PostID = uint(pstID)
+		
+		fmt.Println(pstID)
 
 		// reqBody, err := ioutil.ReadAll(r.Body)
 		// if err != nil {
@@ -234,11 +236,11 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	} else {
 
-		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
+		// ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
 
-// ApplicationsUpdate handle requests on /user/applications/update
+// ApplicationUpdate handle requests on /user/applications/update
 func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {

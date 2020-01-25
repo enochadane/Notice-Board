@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"time"
 	"context"
 	"fmt"
 	"html/template"
@@ -8,13 +9,15 @@ import (
 
 	"github.com/amthesonofGod/Notice-Board/user"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	uuid "github.com/satori/go.uuid"
+	
+	// uuid "github.com/satori/go.uuid"
 
 	"github.com/amthesonofGod/Notice-Board/session"
 
 	"github.com/amthesonofGod/Notice-Board/post"
-	// "github.com/amthesonofGod/Notice-Board/rtoken"
-
+	
+	"github.com/amthesonofGod/Notice-Board/rtoken"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -64,15 +67,19 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func CheckPasswordHash(password, hash string) bool {
-    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-    return err == nil
-}
+// func CheckPasswordHash(password, hash string) bool {
+//     err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+//     return err == nil
+// }
 
 // Login handle requests on /login
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	cookie, errc := r.Cookie("session")
+
+	expireToken := time.Now().Add(time.Minute*30).Unix()
+	// expireCookie := time.Now().Add(time.Minute*30)
+
 
 	if r.Method == http.MethodPost {
 
@@ -92,11 +99,16 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 				// match := CheckPasswordHash(password, user.Password)
 				// fmt.Println("Match:   ", match)
 
+
+				claims := rtoken.Claims(email, expireToken)
+				token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+				signedToken, _ := token.SignedString([]byte(email))
+
 				if errc == http.ErrNoCookie {
-					sID, _ := uuid.NewV4()
+					// sID, _ := uuid.NewV4()
 					cookie = &http.Cookie{
 						Name:  "session",
-						Value: sID.String(),
+						Value: signedToken,
 						Path:  "/",
 					}
 				}
@@ -126,44 +138,6 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// for _, user := range users {
-		// 	if email == user.Email && password == user.Password {
-		// 		fmt.Println("authentication successfull! ")
-
-		// 		if err == http.ErrNoCookie {
-		// 			sID, _ := uuid.NewV4()
-		// 			cookie = &http.Cookie{
-		// 				Name:  "session",
-		// 				Value: sID.String(),
-		// 				Path:  "/",
-		// 			}
-		// 		}
-
-		// 		usr := &user
-		// 		uh.loggedInUser = usr
-		// 		claims := rtoken.Claims(usr.Email, uh.userSess.Expires)
-		// 		session.Create(claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
-		// 		newSess, errs := uh.sessionService.StoreSession(uh.userSess)
-
-		// 		if len(errs) > 0 {
-		// 			panic(errs)
-
-		// 		}
-
-		// 		uh.userSess = newSess
-
-				
-		// 		http.SetCookie(w, cookie)
-		// 		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		// 		break
-
-		// 	} else {
-		// 		fmt.Println("No such user!")
-		// 	}
-		// }
-
-		//io.WriteString(w, cookie.String())
-
 	} else {
 		uh.tmpl.ExecuteTemplate(w, "index_signin_signup.html", nil)
 	}
@@ -189,6 +163,9 @@ func (uh *UserHandler) loggedIn(r *http.Request) bool {
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 	cookie, errc := r.Cookie("session")
+	
+	expireToken := time.Now().Add(time.Minute*30).Unix()
+	// expireCookie := time.Now().Add(time.Minute*30)
 
 	if r.Method == http.MethodPost {
 
@@ -214,7 +191,6 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 			// singnUpForm.VErrors.Add("password", "Password Could not be stored")
 			// uh.tmpl.ExecuteTemplate(w, "signup.layout", singnUpForm)
 			panic(err)
-			return
 		}
 
 		
@@ -228,14 +204,19 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 			panic(errs)
 		}
 
+		claims := rtoken.Claims(usr.Email, expireToken)
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		signedToken, _ := token.SignedString([]byte(usr.Email))
+
 		if errc == http.ErrNoCookie {
-			sID, _ := uuid.NewV4()
+			// sID, _ := uuid.NewV4()
 			cookie = &http.Cookie{
 				Name:  "session",
-				Value: sID.String(),
+				Value: signedToken,
 				Path:  "/",
 			}
 		}
+
 
 		session := &entity.UserSession{}
 		session.UUID = cookie.Value
@@ -280,5 +261,17 @@ func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// userSess, _ := r.Context().Value(ctxUserSessionKey).(*entity.Session)
 	// session.Remove(userSess.UUID, w)
 	// uh.sessionService.DeleteSession(userSess.UUID)
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	cookie, _ := r.Cookie("session")
+
+	cookie = &http.Cookie{
+		Name:  "session",
+		Value: "",
+		Path:  "/",
+
+	}
+
+	http.SetCookie(w, cookie)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
