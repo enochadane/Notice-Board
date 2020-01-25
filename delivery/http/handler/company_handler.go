@@ -10,8 +10,6 @@ import (
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
-
-	// uuid "github.com/satori/go.uuid"
 	
 	"golang.org/x/crypto/bcrypt"
 
