@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
 	"github.com/amthesonofGod/Notice-Board/post"
 
-	uuid "github.com/satori/go.uuid"
+	// uuid "github.com/satori/go.uuid"
 	
 	"golang.org/x/crypto/bcrypt"
 
-	// "github.com/amthesonofGod/Notice-Board/rtoken"
+	"github.com/amthesonofGod/Notice-Board/rtoken"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/amthesonofGod/Notice-Board/session"
 )
 
@@ -78,6 +80,9 @@ func (ch *CompanyHandler) loggedIn(r *http.Request) bool {
 func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	cookie, errc := r.Cookie("session")
+	
+	expireToken := time.Now().Add(time.Minute*30).Unix()
+	expireCookie := time.Now().Add(time.Minute*30)
 
 	if r.Method == http.MethodPost {
 
@@ -99,11 +104,17 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
+				
+				claims := rtoken.Claims(email, expireToken)
+				token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+				signedToken, _ := token.SignedString([]byte(email))
+
 				if errc == http.ErrNoCookie {
-					sID, _ := uuid.NewV4()
+					// sID, _ := uuid.NewV4()
 					cookie = &http.Cookie{
 						Name:  "session",
-						Value: sID.String(),
+						Value: signedToken,
+						Expires: expireCookie,
 						Path:  "/",
 					}
 				}
@@ -117,19 +128,6 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 				if len(errs) > 0 {
 					panic(errs)
 				}
-
-				// c := &cmp
-				// ch.loggedInUserCamp = c
-				// claims := rtoken.Claims(c.Email, ch.campSess.Expires)
-				// session.Create(claims, ch.campSess.UUID, ch.campSess.SigningKey, w)
-				// newSess, errs := ch.sessionService.StoreSessionCamp(ch.campSess)
-				// // session.CompanyName = cmp.Name
-
-				// if len(errs) > 0 {
-				// 	panic(errs)
-				// }
-				// ch.campSess = newSess
-
 
 				http.SetCookie(w, cookie)
 				http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
@@ -152,6 +150,11 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
 	cookie, errc := r.Cookie("session")
+	
+	expireToken := time.Now().Add(time.Minute*30).Unix()
+	expireCookie := time.Now().Add(time.Minute*30)
+
+	
 	if r.Method == http.MethodPost {
 
 		cmp := &entity.Company{}
@@ -176,7 +179,6 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 			// singnUpForm.VErrors.Add("password", "Password Could not be stored")
 			// uh.tmpl.ExecuteTemplate(w, "signup.layout", singnUpForm)
 			panic(err)
-			return
 		}
 
 		cmp.Password = string(hashedPassword)
@@ -187,11 +189,16 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 			panic(errs)
 		}
 
+		claims := rtoken.Claims(cmp.Email, expireToken)
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		signedToken, _ := token.SignedString([]byte(cmp.Email))
+
 		if errc == http.ErrNoCookie {
-			sID, _ := uuid.NewV4()
+			// sID, _ := uuid.NewV4()
 			cookie = &http.Cookie{
 				Name:  "session",
-				Value: sID.String(),
+				Value: signedToken,
+				Expires: expireCookie,
 				Path:  "/",
 			}
 		}
@@ -207,6 +214,8 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		}
 
 		fmt.Println(cmp)
+
+		fmt.Println(cookie.Value)
 
 		fmt.Println("Company added to db")
 
@@ -242,16 +251,16 @@ func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 
 // Logout Logs the company out
 func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("logged-in")
-	if err != http.ErrNoCookie {
-		cookie = &http.Cookie{
-			Name:  "logged-in",
-			Value: "0",
-		}
-		// session := data.Session{Uuid: cookie.Value}
-		// session.DeleteByUUID()
+	cookie, _ := r.Cookie("session")
+
+	cookie = &http.Cookie{
+		Name:  "session",
+		Value: "",
+		Path:  "/",
+
 	}
 
 	http.SetCookie(w, cookie)
+
 	http.Redirect(w, r, "/cmp", 302)
 }

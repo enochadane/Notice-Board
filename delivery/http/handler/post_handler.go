@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"encoding/json"
 
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -54,12 +55,25 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
+	
+	output, err := json.MarshalIndent(authorizedPost, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
 	// fmt.Println("All posts")
 	// fmt.Println(posts)
 
 	// fmt.Println("Current Post")
 	// fmt.Println(authorizedPost)
-	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
+	// cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
 }
 
 // CompanyPostsNew hanlde requests on route /admin/posts/new
