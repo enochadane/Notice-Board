@@ -1,5 +1,6 @@
 {{ define "cmp_index.layout" }}
 {{ template "cmp_navbar" . }}
 {{ template "cmp_index.content" . }}
+
 {{ template "footer" . }}
 {{ end }}

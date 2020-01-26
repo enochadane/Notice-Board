@@ -15,6 +15,8 @@
                     <div class="d-flex w-100 justify-content-start align-items-center">
                         <span class="fa fa-dashboard fa-fw mr-3"></span>
                         <span class="menu-collapsed">Dashboard</span>
+                        <!-- <span class="submenu-icon ml-auto"></span> -->
+                        <!-- <i class="fa fa-caret-down" style="font-size:48px;color:red"></i> -->
                         <span class="submenu-icon ml-auto"></span>
                     </div>
                 </a>
@@ -85,6 +87,8 @@
                     </div>
                 </a>
             </ul>
+
+            <input type="text" value="kingo" id="m">
             <!-- List Group END-->
         </div>
 
@@ -92,6 +96,19 @@
             <div class="container">
                 <div class="row">
                     {{ range . }}
+
+
+                    <input type="text" value={{.category}}>
+                    <script>
+                        var cat = '{{.category}}'
+                        if (cat == "job") {
+                            $("#m").hide()
+                        }
+                    </script>
+
+
+
+
                     <div class="container-fluid">
                         <div class="row">
                             <h4> {{ .Owner }} </h4>

@@ -51,6 +51,7 @@ func (uh *UserHandler) Authenticated(next http.Handler) http.Handler {
 }
 
 // Index handle requests on /
+//Index ...
 func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	if r.URL.Path != "/" {
@@ -63,6 +64,7 @@ func (uh *UserHandler) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 // Login handle requests on /login
+
 func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {

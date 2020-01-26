@@ -17,6 +17,8 @@ import (
 	"github.com/amthesonofGod/Notice-Board/session"
 )
 
+func king(){}
+
 // CompanyHandler handles company handler admin requests
 type CompanyHandler struct {
 	tmpl       *template.Template
@@ -73,8 +75,8 @@ func (ch *CompanyHandler) loggedIn(r *http.Request) bool {
 	return true
 }
 
-// Login handle requests on /cmp-login
-func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
+// LoginC handle requests on /cmp-login
+func (ch *CompanyHandler) LoginC(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 
@@ -126,8 +128,8 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// CreateAccount handle requests on /cmp-signup-account
-func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
+// CreateAccountC handle requests on /cmp-signup-account
+func (ch *CompanyHandler) CreateAccountC(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("session")
 	if r.Method == http.MethodPost {
@@ -187,8 +189,8 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 }
 
-// Home handle requests on /cmp-home
-func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
+// HomeC handle requests on /cmp-home
+func (ch *CompanyHandler) HomeC(w http.ResponseWriter, r *http.Request) {
 
 	// get cookie
 	_, err := r.Cookie("session")
@@ -208,8 +210,8 @@ func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
 }
 
-// Logout Logs the company out
-func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
+// LogoutC Logs the company out
+func (ch *CompanyHandler) LogoutC(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("logged-in")
 	if err != http.ErrNoCookie {
 		cookie = &http.Cookie{

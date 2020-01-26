@@ -28,6 +28,7 @@ func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company
 }
 
 // CompanyPosts handle requests on route /admin/cmp-posts
+//CompanyPosts ...
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 
 	var cookie, cerr = r.Cookie("session")
