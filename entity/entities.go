@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"   /*To install GORM just use the following command = go  get “github.com/jinzhu/gorm” */
 )
 
 // Company represents Companies

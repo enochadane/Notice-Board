@@ -13,7 +13,7 @@ body {
  */
 
 .sidebar {
-  position: fixed;
+  position: fixed; /*The element is positioned relative to the browser window*/
   top: 0;
   bottom: 0;
   left: 0;
@@ -23,7 +23,7 @@ body {
 }
 
 .sidebar-sticky {
-  position: relative;
+  position: relative; /*The element is positioned relative to its normal position, so "left:20px" adds 20 pixels to the element's LEFT position*/
   top: 0;
   height: calc(100vh - 48px);
   padding-top: .5rem;
@@ -33,7 +33,7 @@ body {
 
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
-    position: -webkit-sticky;
+    position: -webkit-sticky;/*The element is positioned based on the user's scroll position */
     position: sticky;
   }
 }
