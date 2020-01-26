@@ -39,7 +39,7 @@ const (
 	user     = "postgres"
 	password = "godisgood"
 	dbname   = "noticeboard"
-) 
+)
 
 var tmpl *template.Template
 
@@ -61,6 +61,9 @@ func createTables(dbconn *gorm.DB) []error {
 }
 
 func main() {
+
+	csrfSignKey := []byte(rtoken.GenerateRandomID(32))
+
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -113,7 +116,7 @@ func main() {
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
 	sess := configSess()
 
-	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess)
+	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess, csrfSignKey)
 
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
 

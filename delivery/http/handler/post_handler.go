@@ -18,9 +18,10 @@ import (
 
 // CompanyPostHandler handles post handler admin requests
 type CompanyPostHandler struct {
-	tmpl       *template.Template
-	postSrv    post.PostService
-	companySrv company.CompanyService
+	tmpl       		*template.Template
+	postSrv   		post.PostService
+	companySrv 		company.CompanyService
+	sessionService	company.SessionServiceCamp	
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
@@ -38,7 +39,7 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	s, serr := cph.companySrv.Session(cookie.Value)
+	s, serr := cph.sessionService.SessionCamp(cookie.Value)
 	if len(serr) > 0 {
 		panic(serr)
 	}
@@ -91,7 +92,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 			fmt.Println(cookievalue)
 		}
 
-		s, serr := cph.companySrv.Session(cookie.Value)
+		s, serr := cph.sessionService.SessionCamp(cookie.Value)
 
 		if len(serr) > 0 {
 			panic(serr)

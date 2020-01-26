@@ -70,36 +70,42 @@ func (uRepo *UserGormRepo) StoreUser(user *entity.User) (*entity.User, []error) 
 	return usr, errs
 }
 
-// StoreSession stores a given session in the database
-func (uRepo *UserGormRepo) StoreSession(session *entity.UserSession) (*entity.UserSession, []error) {
-	s := session
-	errs := uRepo.conn.Create(s).GetErrors()
+// UserByEmail retrieves a user by its email address from the database
+func (uRepo *UserGormRepo) UserByEmail(email string) (*entity.User, []error) {
+	user := entity.User{}
+	errs := uRepo.conn.Find(&user, "email=?", email).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
-	return s, errs
+	return &user, errs
 }
 
-// DeleteSession deletes a given session from the database
-func (uRepo *UserGormRepo) DeleteSession(uuid string) (*entity.UserSession, []error) {
-	s, errs := uRepo.Session(uuid)
+// PhoneExists check if a given phone number is found
+func (uRepo *UserGormRepo) PhoneExists(phone string) bool {
+	user := entity.User{}
+	errs := uRepo.conn.Find(&user, "phone=?", phone).GetErrors()
 	if len(errs) > 0 {
-		return nil, errs
+		return false
 	}
-
-	errs = uRepo.conn.Delete(s, s.UUID).GetErrors()
-	if len(errs) > 0 {
-		return nil, errs
-	}
-	return s, errs
+	return true
 }
 
-// Session retrieve a session from the database by its id
-func (uRepo *UserGormRepo) Session(uuid string) (*entity.UserSession, []error) {
-	s := entity.UserSession{}
-	errs := uRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
+// EmailExists check if a given email is found
+func (uRepo *UserGormRepo) EmailExists(email string) bool {
+	user := entity.User{}
+	errs := uRepo.conn.Find(&user, "email=?", email).GetErrors()
 	if len(errs) > 0 {
-		return nil, errs
+		return false
 	}
-	return &s, errs
+	return true
 }
+
+// UserRoles returns list of application roles that a given user has
+// func (userRepo *UserGormRepo) UserRoles(user *entity.User) ([]entity.Role, []error) {
+// 	userRoles := []entity.Role{}
+// 	errs := userRepo.conn.Model(user).Related(&userRoles).GetErrors()
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return userRoles, errs
+// }

@@ -16,10 +16,11 @@ import (
 
 // RequestHandler handles user event join requests
 type RequestHandler struct {
-	tmpl		*template.Template
-	reqSrv		request.RequestService
-	postSrv 	post.PostService
-	userSrv 	user.UserService
+	tmpl			*template.Template
+	reqSrv			request.RequestService
+	postSrv 		post.PostService
+	userSrv 		user.UserService
+	sessionService 	user.SessionService
 }
 
 // NewRequestHandler initializes and returns new RequestHandler
@@ -32,7 +33,7 @@ func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie("session")
 
-	s, errs := rqh.userSrv.Session(cookie.Value)
+	s, errs := rqh.sessionService.Session(cookie.Value)
 	if len(errs) > 0 {
 		panic(errs)
 	}
@@ -144,7 +145,7 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 		req.Phone = r.FormValue("phone")
 
 		cookie, _ := r.Cookie("session")
-		s, errs := rqh.userSrv.Session(cookie.Value)
+		s, errs := rqh.sessionService.Session(cookie.Value)
 
 		req.UserID = s.UserID
 		pstID, err := strconv.Atoi(r.FormValue("id"))

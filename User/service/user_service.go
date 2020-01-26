@@ -75,37 +75,32 @@ func (us *UserService) DeleteUser(id uint) (*entity.User, []error) {
 	return usr, nil
 }
 
-// StoreSession persists new session information
-func (us *UserService) StoreSession(session *entity.UserSession) (*entity.UserSession, []error) {
-
-	s, errs := us.userRepo.StoreSession(session)
-
+// UserByEmail retrieves an application user by its email address
+func (us *UserService) UserByEmail(email string) (*entity.User, []error) {
+	usr, errs := us.userRepo.UserByEmail(email)
 	if len(errs) > 0 {
 		return nil, errs
 	}
-
-	return s, nil
+	return usr, errs
 }
 
-// DeleteSession delete a session by its id
-func (us *UserService) DeleteSession(uuid string) (*entity.UserSession, []error) {
-
-	s, errs := us.userRepo.DeleteSession(uuid)
-
-	if len(errs) > 0 {
-		return nil, errs
-	}
-	return s, nil
+// PhoneExists check if there is a user with a given phone number
+func (us *UserService) PhoneExists(phone string) bool {
+	exists := us.userRepo.PhoneExists(phone)
+	return exists
 }
 
-// Session returns a session object with a given id
-func (us *UserService) Session(uuid string) (*entity.UserSession, []error) {
-
-	s, errs := us.userRepo.Session(uuid)
-
-	if len(errs) > 0 {
-		return nil, errs
-	}
-
-	return s, nil
+// EmailExists checks if there exist a user with a given email address
+func (us *UserService) EmailExists(email string) bool {
+	exists := us.userRepo.EmailExists(email)
+	return exists
 }
+
+// UserRoles returns list of roles a user has
+// func (us *UserService) UserRoles(user *entity.User) ([]entity.Role, []error) {
+// 	userRoles, errs := us.userRepo.UserRoles(user)
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return userRoles, errs
+// }

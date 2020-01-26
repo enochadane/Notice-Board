@@ -74,37 +74,32 @@ func (cs *CompanyService) DeleteCompany(id uint) (*entity.Company, []error) {
 	return cmp, nil
 }
 
-// StoreSession persists new session information
-func (cs *CompanyService) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
-
-	s, errs := cs.companyRepo.StoreSession(session)
-
+// CompanyByEmail retrieves an application company user by its email address
+func (cs *CompanyService) CompanyByEmail(email string) (*entity.Company, []error) {
+	cmp, errs := cs.companyRepo.CompanyByEmail(email)
 	if len(errs) > 0 {
 		return nil, errs
 	}
-
-	return s, nil
+	return cmp, errs
 }
 
-// DeleteSession delete a session by its id
-func (cs *CompanyService) DeleteSession(uuid string) (*entity.CompanySession, []error) {
-
-	s, errs := cs.companyRepo.DeleteSession(uuid)
-
-	if len(errs) > 0 {
-		return nil, errs
-	}
-	return s, nil
+// PhoneExists check if there is a user with a given phone number
+func (cs *CompanyService) PhoneExists(phone string) bool {
+	exists := cs.companyRepo.PhoneExists(phone)
+	return exists
 }
 
-// Session returns a session object with a given id
-func (cs *CompanyService) Session(uuid string) (*entity.CompanySession, []error) {
-
-	s, errs := cs.companyRepo.Session(uuid)
-
-	if len(errs) > 0 {
-		return nil, errs
-	}
-
-	return s, nil
+// EmailExists checks if there exist a user with a given email address
+func (cs *CompanyService) EmailExists(email string) bool {
+	exists := cs.companyRepo.EmailExists(email)
+	return exists
 }
+
+// UserRoles returns list of roles a user has
+// func (us *UserService) UserRoles(user *entity.User) ([]entity.Role, []error) {
+// 	userRoles, errs := us.userRepo.UserRoles(user)
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return userRoles, errs
+// }

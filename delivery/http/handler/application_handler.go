@@ -15,10 +15,11 @@ import (
 
 // ApplicationHandler handles user job application requests
 type ApplicationHandler struct {
-	tmpl	*template.Template
-	appSrv	application.ApplicationService
-	userSrv user.UserService
-	postSrv post.PostService
+	tmpl			*template.Template
+	appSrv			application.ApplicationService
+	userSrv 		user.UserService
+	sessionService	user.SessionService	
+	postSrv 		post.PostService
 }
 
 // NewApplicationHandler initializes and returns new ApplicationHandler
@@ -31,7 +32,7 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 
 	cookie, _ := r.Cookie("session")
 
-	s, serr := ap.userSrv.Session(cookie.Value)
+	s, serr := ap.sessionService.Session(cookie.Value)
 
 	if len(serr) > 0 {
 		panic(serr)
@@ -204,7 +205,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		writeFile(&mf, fh.Filename)
 
 		cookie, _ := r.Cookie("session")
-		s, errs := ap.userSrv.Session(cookie.Value)
+		s, errs := ap.sessionService.Session(cookie.Value)
 
 		app.UserID = s.UserID
 		pstID, err := strconv.Atoi(r.FormValue("id"))

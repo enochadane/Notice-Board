@@ -70,36 +70,42 @@ func (cRepo *CompanyGormRepo) StoreCompany(company *entity.Company) (*entity.Com
 	return cmp, errs
 }
 
-// StoreSession stores a given session in the database
-func (cRepo *CompanyGormRepo) StoreSession(session *entity.CompanySession) (*entity.CompanySession, []error) {
-	s := session
-	errs := cRepo.conn.Create(s).GetErrors()
+// CompanyByEmail retrieves a company user by its email address from the database
+func (cRepo *CompanyGormRepo) CompanyByEmail(email string) (*entity.Company, []error) {
+	company := entity.Company{}
+	errs := cRepo.conn.Find(&company, "email=?", email).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
-	return s, errs
+	return &company, errs
 }
 
-// DeleteSession deletes a given session from the database
-func (cRepo *CompanyGormRepo) DeleteSession(uuid string) (*entity.CompanySession, []error) {
-	s, errs := cRepo.Session(uuid)
+// PhoneExists check if a given phone number is found
+func (cRepo *CompanyGormRepo) PhoneExists(phone string) bool {
+	comp := entity.Company{}
+	errs := cRepo.conn.Find(&comp, "phone=?", phone).GetErrors()
 	if len(errs) > 0 {
-		return nil, errs
+		return false
 	}
-
-	errs = cRepo.conn.Delete(s, s.UUID).GetErrors()
-	if len(errs) > 0 {
-		return nil, errs
-	}
-	return s, errs
+	return true
 }
 
-// Session retrieve a session from the database by its id
-func (cRepo *CompanyGormRepo) Session(uuid string) (*entity.CompanySession, []error) {
-	s := entity.CompanySession{}
-	errs := cRepo.conn.Where("UUID = ?", uuid).First(&s).GetErrors()
+// EmailExists check if a given email is found
+func (cRepo *CompanyGormRepo) EmailExists(email string) bool {
+	comp := entity.Company{}
+	errs := cRepo.conn.Find(&comp, "email=?", email).GetErrors()
 	if len(errs) > 0 {
-		return nil, errs
+		return false
 	}
-	return &s, errs
+	return true
 }
+
+// UserRoles returns list of application roles that a given user has
+// func (userRepo *UserGormRepo) UserRoles(user *entity.User) ([]entity.Role, []error) {
+// 	userRoles := []entity.Role{}
+// 	errs := userRepo.conn.Model(user).Related(&userRoles).GetErrors()
+// 	if len(errs) > 0 {
+// 		return nil, errs
+// 	}
+// 	return userRoles, errs
+// }
