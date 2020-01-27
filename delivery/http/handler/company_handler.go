@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"github.com/amthesonofGod/Notice-Board/permission"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -31,7 +32,7 @@ type CompanyHandler struct {
 	csrfSignKey    	  	[]byte
 }
 
-
+var currentCompUser *entity.Company
 type cntextKey string
 
 var ctxCompanySessionKey = cntextKey("signed_in_company_session")
@@ -53,6 +54,37 @@ func (ch *CompanyHandler) Authenticated(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(fn)
+}
+
+// Authorized checks if a user has proper authority to access a give route
+func (ch *CompanyHandler) Authorized(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if ch.loggedInUserCamp == nil {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		roles, errs := ch.companySrv.UserRoles(ch.loggedInUserCamp)
+		if len(errs) > 0 {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		for _, role := range roles {
+			permitted := permission.HasPermission(r.URL.Path, role.Name, r.Method)
+			if !permitted {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+		}
+		if r.Method == http.MethodPost {
+			ok, err := rtoken.ValidCSRF(r.FormValue("_csrf"), ch.csrfSignKey)
+			if !ok || (err != nil) {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Admin handle requests on route /admin
@@ -139,6 +171,7 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 		ch.loggedInUserCamp = cmp
+		currentCompUser = ch.loggedInUserCamp
 		claims := rtoken.Claims(cmp.Email, ch.campSess.Expires)
 		
 		// claims := rtoken.Claims(email, expireToken)
@@ -159,7 +192,11 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		// session.UUID = cookie.Value
 		// session.CompanyID = cmp.ID
 
-		session.Create(claims, ch.campSess.UUID, ch.campSess.SigningKey, w)
+		ch.campSess.CompanyID = cmp.ID
+
+		id := uint(ch.campSess.CompanyID)
+
+		session.Create(id, claims, ch.campSess.UUID, ch.campSess.SigningKey, w)
 
 		newSess, errs := ch.sessionService.StoreSessionCamp(ch.campSess)
 

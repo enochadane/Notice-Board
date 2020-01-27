@@ -96,10 +96,10 @@ func (cs *CompanyService) EmailExists(email string) bool {
 }
 
 // UserRoles returns list of roles a user has
-// func (us *UserService) UserRoles(user *entity.User) ([]entity.Role, []error) {
-// 	userRoles, errs := us.userRepo.UserRoles(user)
-// 	if len(errs) > 0 {
-// 		return nil, errs
-// 	}
-// 	return userRoles, errs
-// }
+func (cs *CompanyService) UserRoles(company *entity.Company) ([]entity.Role, []error) {
+	companyRoles, errs := cs.companyRepo.UserRoles(company)
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return companyRoles, errs
+}

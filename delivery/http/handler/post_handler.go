@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"encoding/json"
+	// "encoding/json"
 
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -22,6 +22,7 @@ type CompanyPostHandler struct {
 	postSrv   		post.PostService
 	companySrv 		company.CompanyService
 	sessionService	company.SessionServiceCamp	
+	campSess		*entity.CompanySession
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
@@ -32,17 +33,24 @@ func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company
 // CompanyPosts handle requests on route /admin/cmp-posts
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 
-	var cookie, cerr = r.Cookie("session")
-	if cerr != nil {
-		fmt.Println("no cookie")
-		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
-		return
-	}
+	//cookie, cerr := r.Cookie("session")
+	//if cerr != nil {
+	//	fmt.Println("no cookie")
+	//	http.Redirect(w, r, "/cmp", http.StatusSeeOther)
+	//	return
+	//}
 
-	s, serr := cph.sessionService.SessionCamp(cookie.Value)
-	if len(serr) > 0 {
-		panic(serr)
-	}
+	handler := CompanyHandler{loggedInUserCamp: currentCompUser}
+
+	
+	compID := handler.loggedInUserCamp.ID
+
+	fmt.Println(compID)
+
+	//s, serr := cph.sessionService.SessionCamp(cookie.Value)
+	//if len(serr) > 0 {
+	//	panic(serr)
+	//}
 
 	authorizedPost := []entity.Post{}
 
@@ -51,30 +59,29 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 		panic(errs)
 	}
 	for _, post := range posts {
-		if s.CompanyID == post.CompanyID {
+		if handler.loggedInUserCamp.ID == post.CompanyID {
 			authorizedPost = append(authorizedPost, post)
 		}
 	}
 
-	
-	output, err := json.MarshalIndent(authorizedPost, "", "\t\t")
+	// output, err := json.MarshalIndent(authorizedPost, "", "\t\t")
 
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
+	// if err != nil {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	// 	return
+	// }
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
-	return
+	// w.Header().Set("Content-Type", "application/json")
+	// w.Write(output)
+	// return
 
 	// fmt.Println("All posts")
 	// fmt.Println(posts)
 
-	// fmt.Println("Current Post")
-	// fmt.Println(authorizedPost)
-	// cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
+	fmt.Println("Current Post")
+	fmt.Println(authorizedPost)
+	cph.tmpl.ExecuteTemplate(w, "cmp_post.layout", authorizedPost)
 }
 
 // CompanyPostsNew hanlde requests on route /admin/posts/new
@@ -84,23 +91,27 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 
 	if r.Method == http.MethodPost {
 
-		fmt.Println("post method verified! ")
+		// fmt.Println("post method verified! ")
 
-		var cookie, err = r.Cookie("session")
-		if err == nil {
-			cookievalue := cookie.Value
-			fmt.Println(cookievalue)
-		}
+		// var cookie, err = r.Cookie("session")
+		// if err == nil {
+		// 	cookievalue := cookie.Value
+		// 	fmt.Println(cookievalue)
+		// }
 
-		s, serr := cph.sessionService.SessionCamp(cookie.Value)
+		// s, serr := cph.sessionService.SessionCamp(cookie.Value)
 
-		if len(serr) > 0 {
-			panic(serr)
-		}
+		// if len(serr) > 0 {
+		// 	panic(serr)
+		// }
 
-		fmt.Println(s.CompanyID)
+		// fmt.Println(s.CompanyID)
 
-		cmp, cerr := cph.companySrv.Company(s.CompanyID)
+		handler := CompanyHandler{loggedInUserCamp: currentCompUser}
+
+		compID := handler.loggedInUserCamp.ID
+
+		cmp, cerr := cph.companySrv.Company(compID)
 
 		if len(cerr) > 0 {
 			fmt.Println("i am the error")
@@ -110,7 +121,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		fmt.Println(cmp.Name)
 
 		post := &entity.Post{}
-		post.CompanyID = s.CompanyID
+		post.CompanyID = compID
 		post.Owner = cmp.Name
 		post.Title = r.FormValue("title")
 		post.Description = r.FormValue("description")

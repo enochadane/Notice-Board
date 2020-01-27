@@ -4,6 +4,7 @@ import (
 	// "time"
 	"context"
 	"fmt"
+	"github.com/amthesonofGod/Notice-Board/permission"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -34,6 +35,8 @@ type UserHandler struct {
 	csrfSignKey    []byte
 }
 
+//var currentUser entity.User
+
 type contextKey string
 
 var ctxUserSessionKey = contextKey("signed_in_user_session")
@@ -41,6 +44,12 @@ var ctxUserSessionKey = contextKey("signed_in_user_session")
 // NewUserHandler initializes and returns new NewUserHandler
 func NewUserHandler(T *template.Template, US user.UserService, PS post.PostService, sessServ user.SessionService, usrSess *entity.UserSession, csKey []byte) *UserHandler {
 	return &UserHandler{tmpl: T, userSrv: US, postSrv: PS, sessionService: sessServ, userSess: usrSess, csrfSignKey: csKey}
+}
+
+//CurrentUser ...
+func (uh *UserHandler) CurrentUser() *entity.User {
+	currentUser := uh.loggedInUser
+	return currentUser
 }
 
 // Authenticated checks if a user is authenticated to access a given route
@@ -55,6 +64,37 @@ func (uh *UserHandler) Authenticated(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(fn)
+}
+
+// Authorized checks if a user has proper authority to access a give route
+func (uh *UserHandler) Authorized(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if uh.loggedInUser == nil {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		roles, errs := uh.userSrv.UserRoles(uh.loggedInUser)
+		if len(errs) > 0 {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		for _, role := range roles {
+			permitted := permission.HasPermission(r.URL.Path, role.Name, r.Method)
+			if !permitted {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+		}
+		if r.Method == http.MethodPost {
+			ok, err := rtoken.ValidCSRF(r.FormValue("_csrf"), uh.csrfSignKey)
+			if !ok || (err != nil) {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Index handle requests on /
@@ -100,7 +140,6 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	if r.Method == http.MethodPost {
 
 		// email := r.FormValue("useremail")
@@ -125,6 +164,7 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Match:   ", match)
 
 		uh.loggedInUser = usr
+		//currentUser = uh.loggedInUser
 		claims := rtoken.Claims(usr.Email, uh.userSess.Expires)
 
 		fmt.Println(usr.ID)
@@ -141,11 +181,15 @@ func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		// 	}
 		// }
 
-		session.Create(claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
+		uh.userSess.UserID = usr.ID
+
+		id := uint(uh.userSess.UserID)
+
+		session.Create(id, claims, uh.userSess.UUID, uh.userSess.SigningKey, w)
 
 		// session := &entity.UserSession{}
 		// session.UUID = cookie.Value
-		// session.UserID = user.ID
+		// userSess.UserID = usr.ID
 
 		newSess, errs := uh.sessionService.StoreSession(uh.userSess)
 
@@ -332,8 +376,8 @@ func (uh *UserHandler) Home(w http.ResponseWriter, r *http.Request) {
 
 // Logout hanldes the POST /logout requests
 func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	// userSess, _ := r.Context().Value(ctxUserSessionKey).(*entity.UserSession)
-	session.Remove(uh.userSess.UUID, w)
+	userSess, _ := r.Context().Value(ctxUserSessionKey).(*entity.UserSession)
+	session.Remove(userSess.UUID, w)
 	uh.sessionService.DeleteSession(uh.userSess.UUID)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)

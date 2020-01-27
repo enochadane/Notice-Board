@@ -39,6 +39,14 @@ type User struct {
 	Name     string `json:"name" gorm:"type:varchar(255);not null"`
 	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
 	Password string `json:"password" gorm:"type:varchar(255);not null"`
+	RoleID	 uint
+}
+
+// Role repesents application user roles
+type Role struct {
+	ID    uint
+	Name  string `gorm:"type:varchar(255)"`
+	Users []User
 }
 
 // UserSession represents user sessions

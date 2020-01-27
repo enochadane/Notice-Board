@@ -101,11 +101,11 @@ func (uRepo *UserGormRepo) EmailExists(email string) bool {
 }
 
 // UserRoles returns list of application roles that a given user has
-// func (userRepo *UserGormRepo) UserRoles(user *entity.User) ([]entity.Role, []error) {
-// 	userRoles := []entity.Role{}
-// 	errs := userRepo.conn.Model(user).Related(&userRoles).GetErrors()
-// 	if len(errs) > 0 {
-// 		return nil, errs
-// 	}
-// 	return userRoles, errs
-// }
+func (uRepo *UserGormRepo) UserRoles(user *entity.User) ([]entity.Role, []error) {
+	userRoles := []entity.Role{}
+	errs := uRepo.conn.Model(user).Related(&userRoles).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return userRoles, errs
+}
