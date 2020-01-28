@@ -12,6 +12,9 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/amthesonofGod/Notice-Board/form"
+
 	// "encoding/json"
 
 	"github.com/amthesonofGod/Notice-Board/company"
@@ -21,12 +24,20 @@ import (
 
 // CompanyPostHandler handles post handler admin requests
 type CompanyPostHandler struct {
+<<<<<<< HEAD
+	tmpl           *template.Template
+	postSrv        post.PostService
+	companySrv     company.CompanyService
+	sessionService company.SessionServiceCamp
+	campSess       *entity.CompanySession
+=======
 	tmpl       		*template.Template
 	postSrv   		post.PostService
 	companySrv 		company.CompanyService
 	sessionService	company.SessionServiceCamp	
 	campSess		*entity.CompanySession
 	csrfSignKey		[]byte
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
@@ -37,15 +48,19 @@ func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company
 // CompanyPosts handle requests on route /admin/posts
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 
+<<<<<<< HEAD
+=======
 	token, err := rtoken.CSRFToken(cph.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	handler := CompanyHandler{loggedInUserCamp: currentCompUser}
 
 	authorizedPost := []entity.Post{}
 
 	posts, errs := cph.postSrv.Posts()
+
 	if len(errs) > 0 {
 		panic(errs)
 	}
@@ -78,6 +93,8 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 
 	fmt.Println("companypostsnew function invoked! ")
 
+<<<<<<< HEAD
+=======
 	token, err := rtoken.CSRFToken(cph.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -95,6 +112,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		cph.tmpl.ExecuteTemplate(w, "post-job.layout", newPostForm)
 	}
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	if r.Method == http.MethodPost {
 
 		handler := CompanyHandler{loggedInUserCamp: currentCompUser}
@@ -144,6 +162,15 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 			return
 		}
 
+		// Validate the form contents
+		singnUpForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		singnUpForm.Required("title", "description", "category")
+		// If there are any errors, redisplay the signup form.
+		if !singnUpForm.Valid() {
+			cph.tmpl.ExecuteTemplate(w, "post-job.layout", singnUpForm)
+			return
+		}
+
 		_, errs := cph.postSrv.StorePost(post)
 		// cph.postSrv.StorePost(post)
 
@@ -155,6 +182,13 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		fmt.Println("post added to db")
 
 		http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
+<<<<<<< HEAD
+
+	} else {
+
+		cph.tmpl.ExecuteTemplate(w, "post-job.layout", nil)
+=======
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 	}
 
@@ -204,6 +238,10 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 		}
 		cph.tmpl.ExecuteTemplate(w, "post_update.layout", upPostForm)
 
+<<<<<<< HEAD
+	}
+	if r.Method == http.MethodPost {
+=======
 	} else if r.Method == http.MethodPost {
 		fmt.Println("post method invoked")
 		// Parse the form data
@@ -217,6 +255,7 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 		updatePostForm.Required("title", "description")
 		updatePostForm.MinLength("description", 10)
 		updatePostForm.CSRF = token
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 		pstID, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
@@ -261,10 +300,14 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 		}
 
 		http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
+<<<<<<< HEAD
+
+=======
 		return
 
 	} else {
 		http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	}
 
 }

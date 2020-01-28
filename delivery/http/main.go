@@ -6,9 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
+
+	api "github.com/amthesonofGod/Notice-Board/rest-api"
 
 	repository "github.com/amthesonofGod/Notice-Board/user/repository"
 	service "github.com/amthesonofGod/Notice-Board/user/service"
@@ -37,7 +40,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "godisgood"
+	password = "kingo"
 	dbname   = "noticeboard"
 )
 
@@ -104,22 +107,35 @@ func main() {
 	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
 	requestSrv := reqServ.NewRequestService(requestRepo)
 
+<<<<<<< HEAD
+	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv)
+=======
 
 	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv, csrfSignKey)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv, csrfSignKey)
 
 	//(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession)
 	sessCamp := configSessCamp()
 
+<<<<<<< HEAD
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
+
+	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
+=======
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp, csrfSignKey)
 
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv, csrfSignKey)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	sess := configSess()
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess, csrfSignKey)
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	//r := mux.NewRouter()
 
 	// r := http.NewServeMux()
@@ -130,6 +146,54 @@ func main() {
 
 	//r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
 
+<<<<<<< HEAD
+	r.HandleFunc("/", usrHandler.Index)
+	r.HandleFunc("/login", usrHandler.Login)
+	r.HandleFunc("/signup", usrHandler.CreateAccount)
+	r.Handle("/home", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Home))))
+	r.Handle("/logout", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Logout))))
+
+	r.HandleFunc("/admin", cmpHandler.SignInUp)
+	r.HandleFunc("/admin/login", cmpHandler.LoginC)
+	r.HandleFunc("/admin/signup", cmpHandler.CreateAccountC)
+	r.Handle("/admin/home", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.HomeC))))
+	r.Handle("/admin/profile", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.ShowProfile))))
+	//r.HandleFunc("/admin/dashboard", cmpHandler.Admin)
+	r.Handle("/admin/logout", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.LogoutC))))
+
+	r.Handle("/admin/posts/new", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostsNew))))
+	r.Handle("/admin/posts", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPosts))))
+	r.Handle("/admin/posts/update", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostUpdate))))
+	r.Handle("/admin/posts/delete", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostDelete))))
+
+	r.Handle("/apply", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Apply))))
+	r.Handle("/applications", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Applications))))
+	r.Handle("/received/applications", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.CompanyReceivedApplications))))
+	r.Handle("/received/applications/details", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDetails))))
+	r.Handle("/applications/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationUpdate))))
+	r.Handle("/applications/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDelete))))
+
+	r.Handle("/join", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Join))))
+	r.Handle("/requests", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Requests))))
+	r.Handle("/received/requests", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(requestHandler.CompanyReceivedRequests))))
+	r.Handle("/requests/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestUpdate))))
+	r.Handle("/requests/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestDelete))))
+
+	aplAPI := api.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
+
+	router := httprouter.New()
+
+	router.GET("/v1/admin/applications", aplAPI.Applications)                         //adminRoleHandler.GetRoles
+	router.GET("/v1/admin/recieved/applications", aplAPI.CompanyReceivedApplications) //adminCommentHandler.GetSingleComment
+	router.GET("/v1/admin/applications/:id", aplAPI.ApplicationDetails)               //adminCommentHandler.GetComments
+	router.POST("/v1/admin/applications/apply/:id", aplAPI.Apply)                     //adminCommentHandler.PutComment
+	router.PUT("/v1/admin/applications/update", aplAPI.ApplicationUpdate)             //adminCommentHandler.PostComment
+	router.DELETE("/v1/admin/applications/delete", aplAPI.ApplicationDelete)          // adminCommentHandler.DeleteComment
+
+	//port := fmt.Sprintf(":%s", os.Getenv("HPORT"))
+
+	http.ListenAndServe(":8080", router)
+=======
 	http.HandleFunc("/", usrHandler.Index)
 	http.HandleFunc("/login", usrHandler.Login)
 	http.HandleFunc("/signup", usrHandler.CreateAccount)
@@ -165,6 +229,7 @@ func main() {
 	//port := fmt.Sprintf(":%s", os.Getenv("HPORT"))
 
 	http.ListenAndServe(":8080", nil)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 }
 
 func configSess() *entity.UserSession {

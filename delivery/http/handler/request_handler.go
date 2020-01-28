@@ -168,6 +168,8 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(pstID)
 
+<<<<<<< HEAD
+=======
 		// Validate the form contents
 		applicationForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
 		applicationForm.Required("fullname", "email", "phone")
@@ -180,6 +182,7 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		_, errs := rqh.reqSrv.StoreRequest(req)
 
 		if len(errs) > 0 {

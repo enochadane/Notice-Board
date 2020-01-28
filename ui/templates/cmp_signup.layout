@@ -1,0 +1,7 @@
+{{ define "cmp_signup.layout" }}
+
+{{ template "header" . }}
+{{ template "cmp_signup.content" . }}
+{{ template "footer" . }}
+
+{{ end }}

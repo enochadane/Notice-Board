@@ -34,11 +34,14 @@ func NewApplicationHandler(T *template.Template, AP application.ApplicationServi
 // Applications handle requests on route /applications
 func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
+<<<<<<< HEAD
+=======
 	token, err := rtoken.CSRFToken(ap.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
@@ -100,11 +103,14 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 // CompanyReceivedApplications handle requests on route /received/applications
 func(ap *ApplicationHandler) CompanyReceivedApplications(w http.ResponseWriter, r *http.Request) {
 
+<<<<<<< HEAD
+=======
 	token, err := rtoken.CSRFToken(ap.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
@@ -225,6 +231,8 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		}
 
 
+<<<<<<< HEAD
+=======
 		values := url.Values{}
 		values.Add("id", idRaw)
 		applicationForm := struct {
@@ -241,6 +249,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", applicationForm)
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	}
 
 	if r.Method == http.MethodPost {
@@ -279,6 +288,8 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(pstID)
 		fmt.Println(r.FormValue("id"))
 
+<<<<<<< HEAD
+=======
 		// Validate the form contents
 		applicationForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
 		// applicationForm.Required("fullname", "email", "letter", "resume")
@@ -292,6 +303,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		_, errs := ap.appSrv.StoreApplication(app)
 
 		if len(errs) > 0 {
@@ -299,6 +311,12 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
+<<<<<<< HEAD
+	} else {
+
+		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
+=======
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	}
 }
 

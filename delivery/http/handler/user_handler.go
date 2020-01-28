@@ -4,21 +4,22 @@ import (
 	// "time"
 	"context"
 	"fmt"
-	"github.com/amthesonofGod/Notice-Board/permission"
 	"html/template"
 	"net/http"
 	"net/url"
 
-	"github.com/amthesonofGod/Notice-Board/user"
+	"github.com/amthesonofGod/Notice-Board/permission"
+
 	"github.com/amthesonofGod/Notice-Board/entity"
-	
+	"github.com/amthesonofGod/Notice-Board/user"
+
 	// uuid "github.com/satori/go.uuid"
 
 	"github.com/amthesonofGod/Notice-Board/session"
 
-	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/form"
-	
+	"github.com/amthesonofGod/Notice-Board/post"
+
 	"github.com/amthesonofGod/Notice-Board/rtoken"
 	// "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
@@ -32,7 +33,11 @@ type UserHandler struct {
 	sessionService user.SessionService
 	userSess       *entity.UserSession
 	loggedInUser   *entity.User
+<<<<<<< HEAD
+	userRole       user.RoleService
+=======
 	userRole 		user.RoleService
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	csrfSignKey    []byte
 }
 
@@ -198,7 +203,7 @@ func (uh *UserHandler) loggedIn(r *http.Request) bool {
 
 // CreateAccount handle requests on /signup-account
 func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	
+
 	token, err := rtoken.CSRFToken(uh.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -263,10 +268,14 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		//}
 
 		user := &entity.User{
-			Name: r.FormValue("username"),
-			Email: r.FormValue("useremail"),
+			Name:     r.FormValue("username"),
+			Email:    r.FormValue("useremail"),
 			Password: string(hashedPassword),
+<<<<<<< HEAD
+			RoleID:   0,
+=======
 			RoleID: 0,
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		}
 
 		_, errs := uh.userSrv.StoreUser(user)

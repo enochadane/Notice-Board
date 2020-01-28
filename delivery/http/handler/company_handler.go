@@ -3,19 +3,23 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/amthesonofGod/Notice-Board/permission"
 	"html/template"
 	"net/http"
 	"net/url"
 	"strings"
 
+<<<<<<< HEAD
+	"github.com/amthesonofGod/Notice-Board/permission"
+
+=======
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	// "time"
 
 	"github.com/amthesonofGod/Notice-Board/company"
 	"github.com/amthesonofGod/Notice-Board/entity"
-	"github.com/amthesonofGod/Notice-Board/post"
 	"github.com/amthesonofGod/Notice-Board/form"
-	
+	"github.com/amthesonofGod/Notice-Board/post"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/amthesonofGod/Notice-Board/rtoken"
@@ -25,6 +29,16 @@ import (
 
 // CompanyHandler handles company handler admin requests
 type CompanyHandler struct {
+<<<<<<< HEAD
+	tmpl             *template.Template
+	companySrv       company.CompanyService
+	postSrv          post.PostService
+	sessionService   company.SessionServiceCamp
+	campSess         *entity.CompanySession
+	loggedInUserCamp *entity.Company
+	companyRole      company.RoleService
+	csrfSignKey      []byte
+=======
 	tmpl       			*template.Template
 	companySrv 			company.CompanyService
 	postSrv   			post.PostService
@@ -33,9 +47,11 @@ type CompanyHandler struct {
 	loggedInUserCamp 	*entity.Company
 	companyRole			company.RoleService
 	csrfSignKey    	  	[]byte
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 }
 
 var currentCompUser *entity.Company
+
 type cntextKey string
 
 var ctxCompanySessionKey = cntextKey("signed_in_company_session")
@@ -116,8 +132,13 @@ func (ch *CompanyHandler) loggedIn(r *http.Request) bool {
 	return true
 }
 
+<<<<<<< HEAD
+// LoginC handle requests on /cmp-login
+func (ch *CompanyHandler) LoginC(w http.ResponseWriter, r *http.Request) {
+=======
 // Login handle requests on /cmp-login
 func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 	token, err := rtoken.CSRFToken(ch.csrfSignKey)
 	if err != nil {
@@ -181,15 +202,26 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/admin/home", http.StatusSeeOther)
 			return
 		}
+<<<<<<< HEAD
+=======
+
+		http.Redirect(w, r, "/admin/home", http.StatusSeeOther)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 		http.Redirect(w, r, "/admin/home", http.StatusSeeOther)
 
-	} 
+<<<<<<< HEAD
+	}
 }
 
+// CreateAccountC handle requests on /admin/signup
+func (ch *CompanyHandler) CreateAccountC(w http.ResponseWriter, r *http.Request) {
+
+=======
 // CreateAccount handle requests on /admin/signup
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	token, err := rtoken.CSRFToken(ch.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -254,10 +286,14 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		//}
 
 		company := &entity.Company{
-			Name: r.FormValue("companyname"),
-			Email: r.FormValue("companyemail"),
+			Name:     r.FormValue("companyname"),
+			Email:    r.FormValue("companyemail"),
 			Password: string(hashedPassword),
+<<<<<<< HEAD
+			RoleID:   0,
+=======
 			RoleID: 0,
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		}
 
 		_, errs := ch.companySrv.StoreCompany(company)
@@ -269,11 +305,19 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 
+<<<<<<< HEAD
+	}
+}
+
+// HomeC handle requests on /cmp-home
+func (ch *CompanyHandler) HomeC(w http.ResponseWriter, r *http.Request) {
+=======
 	} 
 }
 
 // Home handle requests on /cmp-home
 func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 
 	posts, _ := ch.postSrv.Posts()
 
@@ -285,13 +329,25 @@ func (ch *CompanyHandler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 	ch.tmpl.ExecuteTemplate(w, "cmp_profile.html", nil)
 }
 
-// Logout Logs the company out
-func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	
+// LogoutC Logs the company out
+func (ch *CompanyHandler) LogoutC(w http.ResponseWriter, r *http.Request) {
+
 	session.Remove(ch.campSess.UUID, w)
 	ch.sessionService.DeleteSessionCamp(ch.campSess.UUID)
 
 	http.Redirect(w, r, "/admin", 302)
+<<<<<<< HEAD
+}
+
+func (ch *CompanyHandler) checkAdmin(rs []entity.Role) bool {
+	for _, r := range rs {
+		if strings.ToUpper(r.Name) == strings.ToUpper("Admin") {
+			return true
+		}
+	}
+	return false
+=======
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 }
 
 func (ch *CompanyHandler) checkAdmin(rs []entity.Role) bool {
