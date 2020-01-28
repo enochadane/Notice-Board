@@ -1,17 +1,4 @@
 {{ define "cmp_post.content"}}
-<<<<<<< HEAD
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2>Menu Categories</h2>
-    </div>
-    <div class="pt-3 pb-2 mb-3">
-        <a class="btn btn-primary btn-lg" href="/admin/posts/new" role="button">Notice</a>
-    </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Id</th>
-=======
     <div class="col-9">
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -24,30 +11,11 @@
             <thead>
               <tr>
                 <th scope="col">Category</th>
->>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Image</th>
                 <th scope="col"></th>
                 <th scope="col"></th>
-<<<<<<< HEAD
-            </tr>
-        </thead>
-        <tbody>
-            {{ range . }}
-            <tr>
-                <th scope="row"> {{ .Id }} </th>
-                <td> {{ .Title }} </td>
-                <td> {{ .Description }} </td>
-                <td> <img src="/assets/img/{{ .Image }}" width="70rem" height="70rem" /> </td>
-                <td> <a href="/cmp/posts/update?id={{ .Id }}">Edit</a> </td>
-                <td> <a href="/cmp/posts/delete?id={{ .Id }}">Delete</a> </td>
-            </tr>
-            {{ end }}
-        </tbody>
-    </table>
-</main>
-=======
               </tr>
             </thead>
             <tbody>
@@ -67,5 +35,4 @@
     </div>
   </div>
 </div>
->>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 {{ end }}

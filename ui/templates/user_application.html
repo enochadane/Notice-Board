@@ -6,12 +6,8 @@
                 </div>
                 <div class="container">
                     <form action="/apply"  method="POST" enctype="multipart/form-data">
-<<<<<<< HEAD
-                        <input type="hidden" name="id" value="{{ .ID }}" />
-=======
                         <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
                         <input type="hidden" name="id" value='{{ .Values.Get "id" }}' />
->>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
                         <div class="form-group row">
                             <label for="fullname" class="col-sm-2 col-form-label">Full Name</label>
                             <div class="col-sm-10">
