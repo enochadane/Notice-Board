@@ -24,7 +24,7 @@
             <div class="row">
                 <p class="display-6" id="abc">Join our community and get updated!!</p>
                 <p class="display-6" id="abcd">Join our community and<br> get updated!!</p>
-                <a href="/cmp"><button class="my-ghost jmb-btn">Company</button></a>
+                <a href="/admin"><button class="my-ghost jmb-btn">Company</button></a>
             </div>
 
         </div>
@@ -39,18 +39,28 @@
                 <div class="col-md-3"></div>
             </div>
             <div class="my-form-container my-sign-up-container" id="signup">
-                <form action="/signup-account" method="POST">
+                <form action="/signup" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
                     <h1>Create Account</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your email for registration</span>
-                    <input name="username" type="text" placeholder="Name" required/>
-                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <!-- <span>or use your email for registration</span> -->
+                    <input name="username" type="text" value='{{ .Values.Get "username" }}' placeholder="Name" required/>
+                    {{with .VErrors.Get "email"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="useremail" type="email" value='{{ .Values.Get "email" }}' placeholder="Email" required/>
+                    {{with .VErrors.Get "password"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="userpassword" type="password" placeholder="Password" required/>
-                    <input name="confirmPassword" type="password" placeholder="Confirm Password" required/>
+                    {{with .VErrors.Get "confirmpassword"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="confirmpassword" type="password" placeholder="Confirm Password" required/>
                     <button type="submit">Sign Up</button>
                 </form>
 
@@ -58,17 +68,28 @@
 
 
             <div class="my-form-container  my-sign-up-containerMobile" id="signupM">
-                <form action="/signup-account" method="POST" id="first">
+                <form action="/signup" method="POST" id="first">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
                     <h1>Create Account</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your email for registration</span>
-                    <input name="username" type="text" placeholder="Name" required/>
-                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <!-- <span>or use your email for registration</span> -->
+                    <input name="username" type="text" value='{{ .Values.Get "username" }}' placeholder="Name" required/>
+                    {{with .VErrors.Get "email"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="useremail" type="email" value='{{ .Values.Get "email" }}' placeholder="Email" required/>
+                    {{with .VErrors.Get "password"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="userpassword" type="password" placeholder="Password" required/>
+                    {{with .VErrors.Get "confirmpassword"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="confirmpassword" type="password" placeholder="Confirm Password" required/>
                     <button type="submit">Sign Up</button>
                     <a id="loginLink">Login?</a>
                 </form>
@@ -77,14 +98,18 @@
 
             <div class="my-form-container my-sign-in-container" id="signin">
                 <form action="/login" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                    {{with .VErrors.Get "generic" }}
+                    <label class="text-danger">{{ . }}</label>
+                    {{end}}
                     <h1>Sign in</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your account</span>
-                    <input name="useremail" type="email" placeholder="Email" required />
+                    <!-- <span>or use your account</span> -->
+                    <input name="useremail" type="email" value='{{ .Values.Get "email" }}' placeholder="Email" required />
                     <input name="userpassword" type="password" placeholder="Password" required/>
                     <a href="#">Forgot your password?</a>
                     <button type="submit">Sign In</button>
@@ -95,14 +120,18 @@
 
             <div class="my-form-container my-sign-in-containerMobile" id="signinM">
                 <form action="/login" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                    {{with .VErrors.Get "generic" }}
+                    <label class="text-danger">{{ . }}</label>
+                    {{end}}
                     <h1>Sign in</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your account</span>
-                    <input name="useremail" type="email" placeholder="Email" required/>
+                    <!-- <span>or use your account</span> -->
+                    <input name="useremail" type="email" value='{{ .Values.Get "email" }}' placeholder="Email" required/>
                     <input name="userpassword" type="password" placeholder="Password" required/>
                     <a href="#">Forgot your password?</a>
                     <button type="submit">Sign In</button>
@@ -130,8 +159,7 @@
     <footer class="bg-info">
         <p>
             INFO_LEHULUM<i class="fa fa-heart"></i> #
-            <a target="_blank" href="https://florin-pop.com">Florin Pop</a> - You can join us to create th world with ful Access of Information
-            <a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
+           
         </p>
     </footer>
 

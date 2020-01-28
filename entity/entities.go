@@ -11,12 +11,12 @@ type Company struct {
 	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
 	Password string `json:"password" gorm:"type:varchar(255);not null"`
 	Posts    []Post
+	RoleID   uint
 }
 
 // CompanySession represents company sessions
 type CompanySession struct {
 	ID         uint
-	CompanyID  uint
 	UUID       string `gorm:"type:varchar(255);not null"`
 	Expires    int64  `gorm:"type:varchar(255);not null"`
 	SigningKey []byte `gorm:"type:varchar(255);not null"`
@@ -37,14 +37,22 @@ type Post struct {
 type User struct {
 	gorm.Model
 	Name     string `json:"name" gorm:"type:varchar(255);not null"`
-	Email    string `json:"email" gorm:"type:varchar(255);not null"`
+	Email    string `json:"email" gorm:"type:varchar(255);not null; unique"`
 	Password string `json:"password" gorm:"type:varchar(255);not null"`
+	RoleID	 uint
+}
+
+// Role repesents application user roles
+type Role struct {
+	ID    		uint
+	Name  		string `gorm:"type:varchar(255)"`
+	Users 		[]User
+	Companies 	[]Company
 }
 
 // UserSession represents user sessions
 type UserSession struct {
 	ID         uint
-	UserID     uint
 	UUID       string `gorm:"type:varchar(255);not null"`
 	Expires    int64  `gorm:"type:varchar(255);not null"`
 	SigningKey []byte `gorm:"type:varchar(255);not null"`
@@ -71,3 +79,4 @@ type Request struct {
 	PostID   uint
 	UserID   uint
 }
+

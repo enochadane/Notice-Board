@@ -39,13 +39,22 @@
                 <div class="col-md-3"></div>
             </div>
             <div class="my-form-container my-sign-up-container" id="signup">
-                <form action="/cmp-signup-account" method="POST">
+                <form action="/admin/signup" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
                     <h1>Create Account</h1>
-
-                    <span>or use your email for registration</span>
                     <input name="companyname" type="text" placeholder="Name" required/>
+                    {{with .VErrors.Get "email"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="companyemail" type="email" placeholder="Email" required/>
+                    {{with .VErrors.Get "password"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="companypassword" type="password" placeholder="Password" required/>
+                    {{with .VErrors.Get "confirmpassword"}}
+                        <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="confirmpassword" type="password" placeholder="Confirm Password" required/>
                     <button type="submit">Sign Up</button>
                 </form>
 
@@ -53,17 +62,28 @@
 
 
             <div class="my-form-container  my-sign-up-containerMobile" id="signupM">
-                <form action="/cmp-signup-account" method="POST" id="first">
+                <form action="/admin/signup" method="POST" id="first">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
                     <h1>Create Account</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your email for registration</span>
+                    <!-- <span>or use your email for registration</span> -->
                     <input name="companyname" type="text" placeholder="Name" required/>
+                    {{with .VErrors.Get "email"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="companyemail" type="email" placeholder="Email" required/>
+                    {{with .VErrors.Get "password"}}
+                        <label class="text-danger">{{.}}</label>
+                    {{end}}
                     <input name="companypassword" type="password" placeholder="Password" required/>
+                    {{with .VErrors.Get "confirmpassword"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input name="confirmpassword" type="password" placeholder="Confirm Password" required/>
                     <button type="submit">Sign Up</button>
                     <a id="loginLink">Login?</a>
                 </form>
@@ -71,14 +91,18 @@
             </div>
 
             <div class="my-form-container my-sign-in-container" id="signin">
-                <form action="/cmp-login" method="POST">
+                <form action="/admin/login" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                    {{with .VErrors.Get "generic" }}
+                    <label class="text-danger">{{ . }}</label>
+                    {{end}}
                     <h1>Sign in</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                         <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                     </div> -->
-                    <span>or use your account</span>
+                    <!-- <span>or use your account</span> -->
                     <input name="companyemail" type="email" placeholder="Email" required/>
                     <input name="companypassword" type="password" placeholder="Password" required/>
                     <a href="#">Forgot your password?</a>
@@ -89,7 +113,11 @@
 
 
             <div class="my-form-container my-sign-in-containerMobile" id="signinM">
-                <form action="/cmp-login" method="POST">
+                <form action="/admin/login" method="POST">
+                    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                    {{with .VErrors.Get "generic" }}
+                    <label class="text-danger">{{ . }}</label>
+                    {{end}}
                     <h1>Sign in</h1>
                     <!-- <div class="my-social-container">
                         <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -125,9 +153,7 @@
     </div>
     <footer class="bg-info">
         <p>
-            INFO_LEHULUM <i class="fa fa-heart"></i> #
-            <a target="_blank" href="https://florin-pop.com">Florin Pop</a> -You can join us to create th world with ful Access of Information
-            <a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
+            INFO_LEHULUM <i class="fa fa-heart"></i>
         </p>
     </footer>
 

@@ -5,28 +5,27 @@
                     <h2>Update Menu Categories</h2>
                 </div>
                 <div class="container">
-                    <form action="/user/requests/update"  method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="{{ .ID }}" />
-                        <input type="hidden" name="postid" value="{{ .PostID }}" />
-                        <input type="hidden" name="userid" value="{{ .UserID }}" />
+                    <form action="/requests/update"  method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                        <input type="hidden" name="id" value='{{ .Values.Get "id" }}' />
                         <div class="form-group row">
                             <label for="fullname" class="col-sm-2 col-form-label">Full Name</label>
                             <div class="col-sm-10">
-                                <input type="text" name="fullname" class="form-control" id="fullname" placeholder="Full Name" value="{{ if .FullName }} {{ .FullName }} {{ end }}">
+                                <input type="text" name="fullname" class="form-control" id="fullname" placeholder="Full Name" value='{{ .Values.Get "fullname" }}'">
                             </div> 
                         </div>
             
                         <div class="form-group row">
                             <label for="email" class="col-sm-2 col-form-label">Email</label>
                             <div class="col-sm-10">
-                                <input type="email" name="email" class="form-control" id="email" placeholder="Email" value="{{ if .Email }} {{ .Email }} {{ end }}">
+                                <input type="email" name="email" class="form-control" id="email" placeholder="Email" value='{{ .Values.Get "email" }}'>
                             </div> 
                         </div>
             
                         <div class="form-group row">
                             <label for="phone" class="col-sm-2 col-form-label">Phone Number</label>
                             <div class="col-sm-10">
-                                <input type="number" name="phone" class="form-control" id="phone" placeholder="Phone" value="{{ if .Phone }} {{ .Phone }} {{ end }}">
+                                <input type="number" name="phone" class="form-control" id="phone" placeholder="Phone" value='{{ .Values.Get "phone" }}'>
                             </div> 
                         </div>
             

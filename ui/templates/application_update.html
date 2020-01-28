@@ -5,40 +5,39 @@
             <h4>Update Application</h4>
         </div>
         <div class="container">
-            <form method="POST" action="/user/applications/update" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="{{ .ID }}" />
-                <input type="hidden" name="postid" value="{{ .PostID }}" />
-                <input type="hidden" name="userid" value="{{ .UserID }}" />
-                <input type="hidden" name="oldresume" value="{{ .Resume }}" />
+            <form method="POST" action="/applications/update" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                <input type="hidden" name="id" value='{{ .Values.Get "id" }}' />
+                <input type="hidden" name="oldresume" value='{{ .Values.Get "oldresume" }}' />
                 <div class="form-group row">
                     <label for="fullname" class="col-sm-2 col-form-label">Full Name</label>
                     <div class="col-sm-10">
-                        <input type="text" name="fullname" class="form-control" id="fullname" placeholder="Full Name" value="{{ if .FullName }} {{ .FullName }} {{ end }}">
+                        <input type="text" name="fullname" class="form-control" id="fullname" placeholder="Full Name" value='{{ .Values.Get "fullname" }}'>
                     </div> 
                 </div>
     
                 <div class="form-group row">
                     <label for="email" class="col-sm-2 col-form-label">Email</label>
                     <div class="col-sm-10">
-                        <input type="email" name="email" class="form-control" id="email" placeholder="Email" value="{{ if .Email }} {{ .Email }} {{ end }}" >
+                        <input type="email" name="email" class="form-control" id="email" placeholder="Email" value='{{ .Values.Get "email" }}' >
                     </div> 
                 </div>
     
                 <div class="form-group row">
                     <label for="phone" class="col-sm-2 col-form-label">Phone Number</label>
                     <div class="col-sm-10">
-                        <input type="number" name="phone" class="form-control" id="phone" placeholder="Phone" value="{{ if .Phone }} {{ .Phone }} {{ end }}" >
+                        <input type="number" name="phone" class="form-control" id="phone" placeholder="Phone" value='{{ .Values.Get "phone" }}' >
                     </div> 
                 </div>
     
                 <div class="form-group">
                     <label for="letter" class="col-sm-2 col-form-label row">Application Letter</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="letter" id="letter" rows="3"> {{ if .Letter }} {{ .Letter }} {{ end }}</textarea>
+                        <textarea class="form-control" name="letter" id="letter" rows="3"> {{ .Values.Get "letter" }} </textarea>
                     </div>  
                 </div>
                 <div class="col-sm-10">
-                    <img src="/assets/img/{{ .Resume }}" width="80px" height="80px" />   
+                    <img src="/assets/img/{{ .Values.Get "oldresume" }}" width="80px" height="80px" />
                 </div>
                 <div class="form-group">
                     <label for="resume" class="col-sm-2 col-form-label">New Resume</label>

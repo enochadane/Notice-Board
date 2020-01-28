@@ -16,14 +16,14 @@
                 </tr>
               </thead>
               <tbody>
-                {{ range .UserApplications }}
+                {{ range .Applications }}
                 <tr>
                   <td scope="row"> {{ .ID }} </td>
                   <td> {{ .FullName }} </td>
                   <td> {{ .Email }} </td>
                   <td> {{ .Phone }} </td>
-                  <td> <a href="/user/applications/update?id={{ .ID }}">Edit</a> </td>
-                  <td> <a href="/user/applications/delete?id={{ .ID }}">Delete</a> </td>
+                  <td> <a href="/applications/update?id={{ .ID }}">Edit</a> </td>
+                  <td> <a href="/applications/delete?id={{ .ID }}">Delete</a> </td>
                 </tr>
                 {{ end }}
               </tbody>
