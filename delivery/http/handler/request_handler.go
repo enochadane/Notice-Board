@@ -2,8 +2,11 @@ package handler
 
 import (
 	"fmt"
+	"github.com/amthesonofGod/Notice-Board/form"
+	"github.com/amthesonofGod/Notice-Board/rtoken"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -16,16 +19,17 @@ import (
 
 // RequestHandler handles user event join requests
 type RequestHandler struct {
-	tmpl			*template.Template
-	reqSrv			request.RequestService
-	postSrv 		post.PostService
-	userSrv 		user.UserService
-	sessionService 	user.SessionService
+	tmpl           *template.Template
+	reqSrv         request.RequestService
+	postSrv        post.PostService
+	userSrv        user.UserService
+	sessionService user.SessionService
+	csrfSignKey    []byte
 }
 
 // NewRequestHandler initializes and returns new RequestHandler
-func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.PostService, US user.UserService) *RequestHandler {
-	return &RequestHandler{tmpl: T, reqSrv: RQ, postSrv: PS, userSrv: US}
+func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.PostService, US user.UserService, csKey []byte) *RequestHandler {
+	return &RequestHandler{tmpl: T, reqSrv: RQ, postSrv: PS, userSrv: US, csrfSignKey:csKey}
 }
 
 // Requests handle requests on route /requests
@@ -106,6 +110,11 @@ func(rqh *RequestHandler) CompanyReceivedRequests(w http.ResponseWriter, r *http
 // Join hanlde requests on route /event/join
 func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
+	token, err := rtoken.CSRFToken(rqh.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 	if r.Method == http.MethodGet {
 
 		idRaw := r.URL.Query().Get("id")
@@ -121,7 +130,21 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 			panic(errs)
 		}
 
-		rqh.tmpl.ExecuteTemplate(w, "user_request.layout", post)
+		values := url.Values{}
+		values.Add("id", idRaw)
+		newRequestForm := struct {
+			Values   url.Values
+			VErrors  form.ValidationErrors
+			Post 	 *entity.Post
+			CSRF     string
+		}{
+			Values:   values,
+			VErrors:  form.ValidationErrors{},
+			Post:	  post,
+			CSRF:     token,
+		}
+
+		rqh.tmpl.ExecuteTemplate(w, "user_request.layout", newRequestForm)
 
 	}
 
@@ -145,6 +168,21 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(pstID)
 
+<<<<<<< HEAD
+=======
+		// Validate the form contents
+		applicationForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		applicationForm.Required("fullname", "email", "phone")
+		applicationForm.MatchesPattern("email", form.EmailRX)
+		applicationForm.MatchesPattern("phone", form.PhoneRX)
+		applicationForm.CSRF = token
+		// If there are any errors, redisplay the signup form.
+		if !applicationForm.Valid() {
+			rqh.tmpl.ExecuteTemplate(w, "user_request.layout", applicationForm)
+			return
+		}
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		_, errs := rqh.reqSrv.StoreRequest(req)
 
 		if len(errs) > 0 {
@@ -158,6 +196,12 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
 // RequestUpdate handle requests on /user/requests/update
 func (rqh *RequestHandler) RequestUpdate(w http.ResponseWriter, r *http.Request) {
+
+	token, err := rtoken.CSRFToken(rqh.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 
 	if r.Method == http.MethodGet {
 
@@ -176,25 +220,55 @@ func (rqh *RequestHandler) RequestUpdate(w http.ResponseWriter, r *http.Request)
 			panic(errs)
 		}
 
-		rqh.tmpl.ExecuteTemplate(w, "request_update.layout", req)
+		values := url.Values{}
+		values.Add("id", idRaw)
+		values.Add("fullname", req.FullName)
+		values.Add("email", req.Email)
+		values.Add("phone", req.Phone)
+		upRequestForm := struct {
+			Values   url.Values
+			VErrors  form.ValidationErrors
+			Request 	 *entity.Request
+			CSRF     string
+		}{
+			Values:   values,
+			VErrors:  form.ValidationErrors{},
+			Request:	  req,
+			CSRF:     token,
+		}
+
+		rqh.tmpl.ExecuteTemplate(w, "request_update.layout", upRequestForm)
 
 	} else if r.Method == http.MethodPost {
 
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		// Validate the form contents
+		updateRequestForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		updateRequestForm.Required("fullname", "phone", "email")
+		updateRequestForm.CSRF = token
+
 		rqs := &entity.Request{}
-		id, _ := strconv.Atoi(r.FormValue("id"))
-		rqs.ID = uint(id)
+		reqID, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
+
+		req, errs := rqh.reqSrv.Request(uint(reqID))
+
+		if len(errs) > 0 {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+
 		rqs.FullName = r.FormValue("fullname")
 		rqs.Email = r.FormValue("email")
 		rqs.Phone = r.FormValue("phone")
 
-		pstID, err := strconv.Atoi(r.FormValue("postid"))
-		if err != nil {
-			panic(err)
-		}
-		usrID, err := strconv.Atoi(r.FormValue("userid"))
-		if err != nil {
-			panic(err)
-		}
+		pstID := req.PostID
+		usrID := req.UserID
 
 		rqs.PostID = uint(pstID)
 		rqs.UserID = uint(usrID)
@@ -202,7 +276,7 @@ func (rqh *RequestHandler) RequestUpdate(w http.ResponseWriter, r *http.Request)
 		fmt.Println(rqs.PostID)
 		fmt.Println(rqs.UserID)
 
-		_, errs := rqh.reqSrv.UpdateRequest(rqs)
+		_, errs = rqh.reqSrv.UpdateRequest(rqs)
 
 		if len(errs) > 0 {
 			panic(errs)

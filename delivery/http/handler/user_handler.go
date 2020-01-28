@@ -33,7 +33,11 @@ type UserHandler struct {
 	sessionService user.SessionService
 	userSess       *entity.UserSession
 	loggedInUser   *entity.User
+<<<<<<< HEAD
 	userRole       user.RoleService
+=======
+	userRole 		user.RoleService
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	csrfSignKey    []byte
 }
 
@@ -267,7 +271,11 @@ func (uh *UserHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 			Name:     r.FormValue("username"),
 			Email:    r.FormValue("useremail"),
 			Password: string(hashedPassword),
+<<<<<<< HEAD
 			RoleID:   0,
+=======
+			RoleID: 0,
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		}
 
 		_, errs := uh.userSrv.StoreUser(user)

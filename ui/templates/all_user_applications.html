@@ -24,8 +24,8 @@
             <td> {{ .Title }} </td>
             <td> {{ .Description }} </td>
             <td> <img src="/assets/img/{{ .Image }}" width="70rem" height="70rem" /> </td>
-            <td> <a href="/cmp/posts/update?id={{ .Id }}">Edit</a> </td>
-            <td> <a href="/cmp/posts/delete?id={{ .Id }}">Delete</a> </td>
+            <td> <a href="/admin/posts/update?id={{ .Id }}">Edit</a> </td>
+            <td> <a href="/admin/posts/delete?id={{ .Id }}">Delete</a> </td>
           </tr>
           {{ end }}
         </tbody>

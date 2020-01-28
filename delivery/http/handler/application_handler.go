@@ -2,8 +2,11 @@ package handler
 
 import (
 	"fmt"
+	"github.com/amthesonofGod/Notice-Board/form"
+	"github.com/amthesonofGod/Notice-Board/rtoken"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
@@ -15,21 +18,30 @@ import (
 
 // ApplicationHandler handles user job application requests
 type ApplicationHandler struct {
-	tmpl			*template.Template
-	appSrv			application.ApplicationService
-	userSrv 		user.UserService
-	sessionService	user.SessionService	
-	postSrv 		post.PostService
+	tmpl           *template.Template
+	appSrv         application.ApplicationService
+	userSrv        user.UserService
+	sessionService user.SessionService
+	postSrv        post.PostService
+	csrfSignKey    []byte
 }
 
 // NewApplicationHandler initializes and returns new ApplicationHandler
-func NewApplicationHandler(T *template.Template, AP application.ApplicationService, US user.UserService, PS post.PostService) *ApplicationHandler {
-	return &ApplicationHandler{tmpl: T, appSrv: AP, userSrv: US, postSrv: PS}
+func NewApplicationHandler(T *template.Template, AP application.ApplicationService, US user.UserService, PS post.PostService, csKey []byte) *ApplicationHandler {
+	return &ApplicationHandler{tmpl: T, appSrv: AP, userSrv: US, postSrv: PS, csrfSignKey:csKey}
 }
 
 // Applications handle requests on route /applications
 func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
+<<<<<<< HEAD
+=======
+	token, err := rtoken.CSRFToken(ap.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
@@ -42,7 +54,6 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 	for _, app := range apps {
 		if handler.loggedInUser.ID == app.UserID {
 			userApplications = append(userApplications, app)
-			// pstid = app.PostID
 		}
 	}
 
@@ -62,22 +73,44 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
+	tmplData := struct {
+		Values  url.Values
+		VErrors form.ValidationErrors
+		Posts   []entity.Post
+		Applications []entity.Application
+		CSRF    string
+	}{
+		Values:  nil,
+		VErrors: nil,
+		Posts:   appliedOnPosts,
+		Applications: userApplications,
+		CSRF:    token,
+	}
+
 	// tmplData := struct {
 	// 	UserApplications	[]entity.Application
 	// 	Post				*entity.Post
 	// }{userApplications, post}
 
-	m := map[string]interface{}{
-		"UserApplications": userApplications,
-		"Post":   appliedOnPosts,
-	}
+	//m := map[string]interface{}{
+	//	"UserApplications": userApplications,
+	//	"Post":   appliedOnPosts,
+	//}
 	
-	ap.tmpl.ExecuteTemplate(w, "application_list.layout", m)
+	ap.tmpl.ExecuteTemplate(w, "application_list.layout", tmplData)
 }
 
 // CompanyReceivedApplications handle requests on route /received/applications
 func(ap *ApplicationHandler) CompanyReceivedApplications(w http.ResponseWriter, r *http.Request) {
 
+<<<<<<< HEAD
+=======
+	token, err := rtoken.CSRFToken(ap.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
@@ -102,19 +135,39 @@ func(ap *ApplicationHandler) CompanyReceivedApplications(w http.ResponseWriter, 
 		}
 	}
 
-	m := map[string]interface{}{
-		"UserApplications": userApplications,
-		"Post":   appliedOnPosts,
+	fmt.Println(userApplications)
+
+	//m := map[string]interface{}{
+	//	"UserApplications": userApplications,
+	//	"Post":   appliedOnPosts,
+
+	tmplData := struct {
+		Values  url.Values
+		VErrors form.ValidationErrors
+		Posts   []entity.Post
+		Applications []entity.Application
+		CSRF    string
+	}{
+		Values:  nil,
+		VErrors: nil,
+		Posts:   appliedOnPosts,
+		Applications: userApplications,
+		CSRF:    token,
 	}
 	
-	ap.tmpl.ExecuteTemplate(w, "received_applications.layout", m)
+	ap.tmpl.ExecuteTemplate(w, "received_applications.layout", tmplData)
 }
 
 //ApplicationDetails handle requests on route /received/applications/details
 func(ap *ApplicationHandler) ApplicationDetails(w http.ResponseWriter, r *http.Request) {
-	
+
+	//token, err := rtoken.CSRFToken(ap.csrfSignKey)
+	//if err != nil {
+	//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	//}
+
 	if r.Method == http.MethodGet {
-		
+
 		idRaw := r.URL.Query().Get("id")
 		id, err := strconv.Atoi(idRaw)
 
@@ -132,6 +185,18 @@ func(ap *ApplicationHandler) ApplicationDetails(w http.ResponseWriter, r *http.R
 
 		fmt.Println(app)
 
+		//tmplData := struct {
+		//	Values  url.Values
+		//	VErrors form.ValidationErrors
+		//	Application *entity.Application
+		//	CSRF    string
+		//}{
+		//	Values:  nil,
+		//	VErrors: nil,
+		//	Application: app,
+		//	CSRF:    token,
+		//}
+
 		ap.tmpl.ExecuteTemplate(w, "received_applications_detail.layout", app)
 	} else {
 		
@@ -142,7 +207,13 @@ func(ap *ApplicationHandler) ApplicationDetails(w http.ResponseWriter, r *http.R
 // Apply hanlde requests on route /job/apply
 func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
+	token, err := rtoken.CSRFToken(ap.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 	if r.Method == http.MethodGet {
+
 
 		idRaw := r.URL.Query().Get("id")
 		id, err := strconv.Atoi(idRaw)
@@ -159,12 +230,31 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 			panic(errs)
 		}
 
-		ap.tmpl.ExecuteTemplate(w, "user_application.layout", post)
 
+<<<<<<< HEAD
+=======
+		values := url.Values{}
+		values.Add("id", idRaw)
+		applicationForm := struct {
+			Values  url.Values
+			VErrors form.ValidationErrors
+			Post    *entity.Post
+			CSRF    string
+		}{
+			Values:  values,
+			VErrors: nil,
+			Post:   post,
+			CSRF:    token,
+		}
+
+		ap.tmpl.ExecuteTemplate(w, "user_application.layout", applicationForm)
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	}
 
 	if r.Method == http.MethodPost {
 
+		fmt.Println("post invoked")
 		app := &entity.Application{}
 		app.FullName = r.FormValue("fullname")
 		app.Email = r.FormValue("email")
@@ -198,6 +288,22 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(pstID)
 		fmt.Println(r.FormValue("id"))
 
+<<<<<<< HEAD
+=======
+		// Validate the form contents
+		applicationForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		// applicationForm.Required("fullname", "email", "letter", "resume")
+		// applicationForm.MatchesPattern("useremail", form.EmailRX)
+		// applicationForm.MatchesPattern("phone", form.PhoneRX)
+		applicationForm.MinLength("letter", 20)
+		applicationForm.CSRF = token
+		// If there are any errors, redisplay the signup form.
+		if !applicationForm.Valid() {
+			ap.tmpl.ExecuteTemplate(w, "user_application.layout", applicationForm)
+			return
+		}
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 		_, errs := ap.appSrv.StoreApplication(app)
 
 		if len(errs) > 0 {
@@ -205,14 +311,22 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
+<<<<<<< HEAD
 	} else {
 
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
+=======
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	}
 }
 
-// ApplicationUpdate handle requests on /user/applications/update
+// ApplicationUpdate handle requests on /applications/update
 func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.Request) {
+
+	token, err := rtoken.CSRFToken(ap.csrfSignKey)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 
 	if r.Method == http.MethodGet {
 
@@ -228,22 +342,59 @@ func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.R
 		app, errs := ap.appSrv.Application(uint(id))
 
 		if len(errs) > 0 {
-			panic(errs)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 
-		ap.tmpl.ExecuteTemplate(w, "application_update.layout", app)
+		values := url.Values{}
+		values.Add("id", idRaw)
+		values.Add("fullname", app.FullName)
+		values.Add("email", app.Email)
+		values.Add("phone", app.Phone)
+		values.Add("letter", app.Letter)
+		values.Add("oldresume", app.Resume)
+		upApplicationForm := struct {
+			Values   url.Values
+			VErrors  form.ValidationErrors
+			Application 	 *entity.Application
+			CSRF     string
+		}{
+			Values:   values,
+			VErrors:  form.ValidationErrors{},
+			Application:	  app,
+			CSRF:     token,
+		}
+
+		ap.tmpl.ExecuteTemplate(w, "application_update.layout", upApplicationForm)
 
 	} else if r.Method == http.MethodPost {
 
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		// Validate the form contents
+		updateApplicationForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		updateApplicationForm.Required("fullname", "letter")
+		updateApplicationForm.MinLength("letter", 20)
+		updateApplicationForm.CSRF = token
+
+		appID, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
+
+		app, errs := ap.appSrv.Application(uint(appID))
+
+		if len(errs) > 0 {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+
 		appc := &entity.Application{}
-		id, _ := strconv.Atoi(r.FormValue("id"))
-		appc.ID = uint(id)
+		appc.ID = uint(appID)
 
-		userid, _ := strconv.Atoi(r.FormValue("userid"))
-		postid, _ := strconv.Atoi(r.FormValue("postid"))
-
-		appc.UserID = uint(userid)
-		appc.PostID = uint(postid)
+		appc.UserID = app.UserID
+		appc.PostID = app.PostID
 
 		fmt.Println(appc.UserID)
 		fmt.Println(appc.PostID)
@@ -257,17 +408,18 @@ func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.R
 
 		mf, fh, err := r.FormFile("resume")
 
-		if err != nil {
-			panic(err)
+		if err == nil {
+			appc.Resume = fh.Filename
+
+			writeFile(&mf, appc.Resume)
 		}
 
-		defer mf.Close()
+		if mf != nil {
+			defer mf.Close()
+		}
 
-		appc.Resume = fh.Filename
 
-		writeFile(&mf, appc.Resume)
-
-		_, errs := ap.appSrv.UpdateApplication(appc)
+		_, errs = ap.appSrv.UpdateApplication(appc)
 
 		if len(errs) > 0 {
 			panic(errs)

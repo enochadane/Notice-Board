@@ -4,6 +4,8 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h4>Received Applications</h4>
     </div>
+
+      <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
     <table class="table table-striped">
         <thead>
           <tr>
@@ -15,13 +17,13 @@
           </tr>
         </thead>
         <tbody>
-          {{ range .UserApplications }}
+          {{ range .Applications }}
           <tr>
             <td scope="row"> {{ .ID }} </td>
             <td> {{ .Phone }} </td>
             <td> {{ .Email }} </td>
-            <td> <a href="/received/applications/details?id={{ .ID }}">Details</a> </td>
-            <td> <a href="/cmp/posts/delete?id={{ .ID }}">Delete</a> </td>
+            <td> <a href="/admin/received/applications/details?id={{ .ID }}">Details</a> </td>
+            <td> <a href="#">Invite</a> </td>
           </tr>
           {{ end }}
         </tbody>

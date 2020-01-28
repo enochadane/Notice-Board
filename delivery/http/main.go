@@ -107,30 +107,46 @@ func main() {
 	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
 	requestSrv := reqServ.NewRequestService(requestRepo)
 
+<<<<<<< HEAD
 	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv)
+=======
 
-	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
+	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv, csrfSignKey)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
+
+	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv, csrfSignKey)
 
 	//(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession)
 	sessCamp := configSessCamp()
 
+<<<<<<< HEAD
 	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
 
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
+=======
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp, csrfSignKey)
+
+	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv, csrfSignKey)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	sess := configSess()
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess, csrfSignKey)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 	//r := mux.NewRouter()
 
-	r := http.NewServeMux()
+	// r := http.NewServeMux()
 
 	// Server CSS, JS & Images Statically.
 	fs := http.FileServer(http.Dir("../../ui/assets"))
-	r.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	//r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("../../ui/assets"))))
 
+<<<<<<< HEAD
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
 	r.HandleFunc("/signup", usrHandler.CreateAccount)
@@ -177,6 +193,43 @@ func main() {
 	//port := fmt.Sprintf(":%s", os.Getenv("HPORT"))
 
 	http.ListenAndServe(":8080", router)
+=======
+	http.HandleFunc("/", usrHandler.Index)
+	http.HandleFunc("/login", usrHandler.Login)
+	http.HandleFunc("/signup", usrHandler.CreateAccount)
+	http.Handle("/home", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Home))))
+	http.Handle("/logout", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Logout))))
+
+	http.HandleFunc("/admin", cmpHandler.SignInUp)
+	http.HandleFunc("/admin/login", cmpHandler.Login)
+	http.HandleFunc("/admin/signup", cmpHandler.CreateAccount)
+	http.Handle("/admin/home", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.Home))))
+	http.Handle("/admin/profile", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.ShowProfile))))
+	//http.HandleFunc("/admin/dashboard", cmpHandler.Admin)
+	http.Handle("/admin/logout",cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.Logout))))
+
+	http.Handle("/admin/new-post", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostsNew))))
+	http.Handle("/admin/posts", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPosts))))
+	http.Handle("/admin/posts/update", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostUpdate))))
+	http.Handle("/admin/posts/delete", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostDelete))))
+
+	http.Handle("/apply", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Apply))))
+	http.Handle("/applications", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Applications))))
+	http.Handle("/admin/received/applications", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.CompanyReceivedApplications))))
+	http.Handle("/admin/received/applications/details", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDetails))))
+	http.Handle("/applications/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationUpdate))))
+	http.Handle("/applications/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDelete))))
+
+	http.Handle("/join", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Join))))
+	http.Handle("/requests", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Requests))))
+	http.Handle("/admin/received/requests", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(requestHandler.CompanyReceivedRequests))))
+	http.Handle("/requests/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestUpdate))))
+	http.Handle("/requests/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestDelete))))
+
+	//port := fmt.Sprintf(":%s", os.Getenv("HPORT"))
+
+	http.ListenAndServe(":8080", nil)
+>>>>>>> 997df0981b2ffe30de1cb2328c8e127e034eedeb
 }
 
 func configSess() *entity.UserSession {

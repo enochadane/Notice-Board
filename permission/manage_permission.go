@@ -48,6 +48,10 @@ var authorities = authority{
 		roles:   []string{"ADMIN"},
 		methods: []string{"GET", "POST"},
 	},
+	// "/admin/posts/new": permission{
+	// 	roles:   []string{"ADMIN"},
+	// 	methods: []string{"GET", "POST"},
+	// },
 }
 
 // HasPermission checks if a given role has permission to access a given route for a given method
