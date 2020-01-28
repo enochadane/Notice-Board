@@ -16,11 +16,11 @@ var authorities = authority{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},
-	"/login": permission{
+	"/join": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},
-	"/join": permission{
+	"/login": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET"},
 	},
@@ -36,7 +36,11 @@ var authorities = authority{
 		roles:   []string{"USER"},
 		methods: []string{"GET"},
 	},
-	"/order": permission{
+	"/applications": permission{
+		roles:   []string{"USER"},
+		methods: []string{"GET", "POST"},
+	},
+	"/requests": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},

@@ -22,8 +22,8 @@
                 <td> {{ .FullName }} </td>
                 <td> {{ .Email }} </td>
                 <td> {{ .Phone }} </td>
-                <td> <a href="/user/requests/update?id={{ .ID }}">Edit</a> </td>
-                <td> <a href="/user/requests/delete?id={{ .ID }}">Delete</a> </td>
+                <td> <a href="/requests/update?id={{ .ID }}">Edit</a> </td>
+                <td> <a href="/requests/delete?id={{ .ID }}">Delete</a> </td>
               </tr>
               {{ end }}
             </tbody>

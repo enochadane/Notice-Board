@@ -6,9 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 
 	"github.com/amthesonofGod/Notice-Board/entity"
+
+	api "github.com/amthesonofGod/Notice-Board/rest-api"
 
 	repository "github.com/amthesonofGod/Notice-Board/user/repository"
 	service "github.com/amthesonofGod/Notice-Board/user/service"
@@ -37,7 +40,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "godisgood"
+	password = "kingo"
 	dbname   = "noticeboard"
 )
 
@@ -49,9 +52,8 @@ func init() {
 
 func createTables(dbconn *gorm.DB) []error {
 
-	// dbconn.DropTableIfExists(&entity.CompanySession{}, &entity.UserSession{})
-	// errs := dbconn.CreateTable( &entity.Request{}, &entity.Application{}).GetErrors()
-	errs := dbconn.CreateTable(&entity.Role{}, &entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.Role{}, &entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}, &entity.Request{}, &entity.Application{})
+	errs := dbconn.CreateTable(&entity.Role{}, &entity.CompanySession{}, &entity.UserSession{}, &entity.Post{}, &entity.User{}, &entity.Company{}, &entity.Request{}, &entity.Application{}).GetErrors()
 
 	if errs != nil {
 		return errs
@@ -78,7 +80,7 @@ func main() {
 
 	defer dbconn.Close()
 
-	createTables(dbconn)
+	// createTables(dbconn)
 
 	// if err := dbconn.Ping(); err != nil {
 	// 	panic(err)
@@ -105,7 +107,6 @@ func main() {
 	requestRepo := reqRepos.NewRequestGormRepo(dbconn)
 	requestSrv := reqServ.NewRequestService(requestRepo)
 
-
 	requestHandler := handler.NewRequestHandler(tmpl, requestSrv, postSrv, userSrv)
 
 	applicationHandler := handler.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
@@ -113,12 +114,12 @@ func main() {
 	//(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession)
 	sessCamp := configSessCamp()
 
+	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
+
 	postHandler := handler.NewCompanyPostHandler(tmpl, postSrv, companySrv)
 	sess := configSess()
 
 	usrHandler := handler.NewUserHandler(tmpl, userSrv, postSrv, userSessionsrv, sess, csrfSignKey)
-
-	cmpHandler := handler.NewCompanyHandler(tmpl, companySrv, postSrv, companySessionSrv, sessCamp)
 
 	//r := mux.NewRouter()
 
@@ -132,37 +133,50 @@ func main() {
 
 	r.HandleFunc("/", usrHandler.Index)
 	r.HandleFunc("/login", usrHandler.Login)
-	r.HandleFunc("/signup-account", usrHandler.CreateAccount)
-	r.HandleFunc("/home", usrHandler.Home)
-	r.HandleFunc("/logout", usrHandler.Logout)
+	r.HandleFunc("/signup", usrHandler.CreateAccount)
+	r.Handle("/home", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Home))))
+	r.Handle("/logout", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(usrHandler.Logout))))
 
-	r.HandleFunc("/cmp", cmpHandler.SignInUp)
-	r.HandleFunc("/cmp-login", cmpHandler.Login)
-	r.HandleFunc("/cmp-signup-account", cmpHandler.CreateAccount)
-	r.HandleFunc("/cmp-home", cmpHandler.Home)
-	r.HandleFunc("/cmp-profile", cmpHandler.ShowProfile)
-	r.HandleFunc("/admin", cmpHandler.Admin)
-	r.HandleFunc("/cmp-logout",cmpHandler.Logout)
+	r.HandleFunc("/admin", cmpHandler.SignInUp)
+	r.HandleFunc("/admin/login", cmpHandler.LoginC)
+	r.HandleFunc("/admin/signup", cmpHandler.CreateAccountC)
+	r.Handle("/admin/home", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.HomeC))))
+	r.Handle("/admin/profile", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.ShowProfile))))
+	//r.HandleFunc("/admin/dashboard", cmpHandler.Admin)
+	r.Handle("/admin/logout", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(cmpHandler.LogoutC))))
 
-	r.HandleFunc("/admin/posts/new", postHandler.CompanyPostsNew)
-	r.HandleFunc("/admin/cmp-posts", postHandler.CompanyPosts)
-	r.HandleFunc("/cmp/posts/update", postHandler.CompanyPostUpdate)
-	r.HandleFunc("/cmp/posts/delete", postHandler.CompanyPostDelete)
+	r.Handle("/admin/posts/new", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostsNew))))
+	r.Handle("/admin/posts", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPosts))))
+	r.Handle("/admin/posts/update", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostUpdate))))
+	r.Handle("/admin/posts/delete", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(postHandler.CompanyPostDelete))))
 
-	r.HandleFunc("/job/apply", applicationHandler.Apply)
-	r.HandleFunc("/applications", applicationHandler.Applications)
-	r.HandleFunc("/received/applications", applicationHandler.CompanyReceivedApplications)
-	r.HandleFunc("/received/applications/details", applicationHandler.ApplicationDetails)
-	r.HandleFunc("/user/applications/update", applicationHandler.ApplicationUpdate)
-	r.HandleFunc("/user/applications/delete", applicationHandler.ApplicationDelete)
+	r.Handle("/apply", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Apply))))
+	r.Handle("/applications", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.Applications))))
+	r.Handle("/received/applications", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.CompanyReceivedApplications))))
+	r.Handle("/received/applications/details", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDetails))))
+	r.Handle("/applications/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationUpdate))))
+	r.Handle("/applications/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(applicationHandler.ApplicationDelete))))
 
-	r.HandleFunc("/event/join", requestHandler.Join)
-	r.HandleFunc("/requests", requestHandler.Requests)
-	r.HandleFunc("/received/requests", requestHandler.CompanyReceivedRequests)
-	r.HandleFunc("/user/requests/update", requestHandler.RequestUpdate)
-	r.HandleFunc("/user/requests/delete", requestHandler.RequestDelete)
+	r.Handle("/join", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Join))))
+	r.Handle("/requests", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.Requests))))
+	r.Handle("/received/requests", cmpHandler.Authenticated(cmpHandler.Authorized(http.HandlerFunc(requestHandler.CompanyReceivedRequests))))
+	r.Handle("/requests/update", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestUpdate))))
+	r.Handle("/requests/delete", usrHandler.Authenticated(usrHandler.Authorized(http.HandlerFunc(requestHandler.RequestDelete))))
 
-	http.ListenAndServe(":8080", r)
+	aplAPI := api.NewApplicationHandler(tmpl, applicationSrv, userSrv, postSrv)
+
+	router := httprouter.New()
+
+	router.GET("/v1/admin/applications", aplAPI.Applications)                         //adminRoleHandler.GetRoles
+	router.GET("/v1/admin/recieved/applications", aplAPI.CompanyReceivedApplications) //adminCommentHandler.GetSingleComment
+	router.GET("/v1/admin/applications/:id", aplAPI.ApplicationDetails)               //adminCommentHandler.GetComments
+	router.POST("/v1/admin/applications/apply/:id", aplAPI.Apply)                     //adminCommentHandler.PutComment
+	router.PUT("/v1/admin/applications/update", aplAPI.ApplicationUpdate)             //adminCommentHandler.PostComment
+	router.DELETE("/v1/admin/applications/delete", aplAPI.ApplicationDelete)          // adminCommentHandler.DeleteComment
+
+	//port := fmt.Sprintf(":%s", os.Getenv("HPORT"))
+
+	http.ListenAndServe(":8080", router)
 }
 
 func configSess() *entity.UserSession {

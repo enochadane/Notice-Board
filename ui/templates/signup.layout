@@ -1,0 +1,7 @@
+{{ define "signup.layout" }}
+
+{{ template "header" . }}
+{{ template "signup.content" . }}
+{{ template "footer" . }}
+
+{{ end }}

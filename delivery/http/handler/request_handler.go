@@ -31,12 +31,7 @@ func NewRequestHandler(T *template.Template, RQ request.RequestService, PS post.
 // Requests handle requests on route /requests
 func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
-	cookie, _ := r.Cookie("session")
-
-	s, errs := rqh.sessionService.Session(cookie.Value)
-	if len(errs) > 0 {
-		panic(errs)
-	}
+	handler := UserHandler{loggedInUser: currentUser}
 
 	reqs, errs := rqh.reqSrv.Requests()
 	if len(errs) > 0 {
@@ -46,7 +41,7 @@ func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 	userRequests := []entity.Request{}
 
 	for _, req := range reqs {
-		if s.UserID == req.UserID {
+		if handler.loggedInUser.ID == req.UserID {
 			userRequests = append(userRequests, req)
 		}
 	}
@@ -76,13 +71,6 @@ func (rqh *RequestHandler) Requests(w http.ResponseWriter, r *http.Request) {
 
 // CompanyReceivedRequests handle requests on route /received/requests
 func(rqh *RequestHandler) CompanyReceivedRequests(w http.ResponseWriter, r *http.Request) {
-
-	// cookie, _ := r.Cookie("session")
-
-	// s, errs := rqh.companySrv.Session(cookie.Value)
-	// if len(errs) > 0 {
-	// 	panic((errs))
-	// }
 
 	reqs, errs := rqh.reqSrv.Requests()
 	if len(errs) > 0 {
@@ -144,10 +132,9 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 		req.Email = r.FormValue("email")
 		req.Phone = r.FormValue("phone")
 
-		cookie, _ := r.Cookie("session")
-		s, errs := rqh.sessionService.Session(cookie.Value)
+		handler := UserHandler{loggedInUser: currentUser}
 
-		req.UserID = s.UserID
+		req.UserID = handler.loggedInUser.ID
 		pstID, err := strconv.Atoi(r.FormValue("id"))
 
 		if err != nil {
@@ -158,7 +145,7 @@ func (rqh *RequestHandler) Join(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(pstID)
 
-		_, errs = rqh.reqSrv.StoreRequest(req)
+		_, errs := rqh.reqSrv.StoreRequest(req)
 
 		if len(errs) > 0 {
 			panic(errs)

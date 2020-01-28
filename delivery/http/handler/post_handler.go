@@ -9,6 +9,9 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/amthesonofGod/Notice-Board/form"
+
 	// "encoding/json"
 
 	"github.com/amthesonofGod/Notice-Board/company"
@@ -18,11 +21,11 @@ import (
 
 // CompanyPostHandler handles post handler admin requests
 type CompanyPostHandler struct {
-	tmpl       		*template.Template
-	postSrv   		post.PostService
-	companySrv 		company.CompanyService
-	sessionService	company.SessionServiceCamp	
-	campSess		*entity.CompanySession
+	tmpl           *template.Template
+	postSrv        post.PostService
+	companySrv     company.CompanyService
+	sessionService company.SessionServiceCamp
+	campSess       *entity.CompanySession
 }
 
 // NewCompanyPostHandler initializes and returns new CompanyPostHandler
@@ -30,31 +33,15 @@ func NewCompanyPostHandler(T *template.Template, PS post.PostService, CP company
 	return &CompanyPostHandler{tmpl: T, postSrv: PS, companySrv: CP}
 }
 
-// CompanyPosts handle requests on route /admin/cmp-posts
+// CompanyPosts handle requests on route /admin/posts
 func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Request) {
 
-	//cookie, cerr := r.Cookie("session")
-	//if cerr != nil {
-	//	fmt.Println("no cookie")
-	//	http.Redirect(w, r, "/cmp", http.StatusSeeOther)
-	//	return
-	//}
-
 	handler := CompanyHandler{loggedInUserCamp: currentCompUser}
-
-	
-	compID := handler.loggedInUserCamp.ID
-
-	fmt.Println(compID)
-
-	//s, serr := cph.sessionService.SessionCamp(cookie.Value)
-	//if len(serr) > 0 {
-	//	panic(serr)
-	//}
 
 	authorizedPost := []entity.Post{}
 
 	posts, errs := cph.postSrv.Posts()
+
 	if len(errs) > 0 {
 		panic(errs)
 	}
@@ -63,21 +50,6 @@ func (cph *CompanyPostHandler) CompanyPosts(w http.ResponseWriter, r *http.Reque
 			authorizedPost = append(authorizedPost, post)
 		}
 	}
-
-	// output, err := json.MarshalIndent(authorizedPost, "", "\t\t")
-
-	// if err != nil {
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-	// 	return
-	// }
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.Write(output)
-	// return
-
-	// fmt.Println("All posts")
-	// fmt.Println(posts)
 
 	fmt.Println("Current Post")
 	fmt.Println(authorizedPost)
@@ -90,22 +62,6 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 	fmt.Println("companypostsnew function invoked! ")
 
 	if r.Method == http.MethodPost {
-
-		// fmt.Println("post method verified! ")
-
-		// var cookie, err = r.Cookie("session")
-		// if err == nil {
-		// 	cookievalue := cookie.Value
-		// 	fmt.Println(cookievalue)
-		// }
-
-		// s, serr := cph.sessionService.SessionCamp(cookie.Value)
-
-		// if len(serr) > 0 {
-		// 	panic(serr)
-		// }
-
-		// fmt.Println(s.CompanyID)
 
 		handler := CompanyHandler{loggedInUserCamp: currentCompUser}
 
@@ -139,6 +95,15 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 
 		writeFile(&mf, fh.Filename)
 
+		// Validate the form contents
+		singnUpForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
+		singnUpForm.Required("title", "description", "category")
+		// If there are any errors, redisplay the signup form.
+		if !singnUpForm.Valid() {
+			cph.tmpl.ExecuteTemplate(w, "post-job.layout", singnUpForm)
+			return
+		}
+
 		_, errs := cph.postSrv.StorePost(post)
 		// cph.postSrv.StorePost(post)
 
@@ -149,7 +114,7 @@ func (cph *CompanyPostHandler) CompanyPostsNew(w http.ResponseWriter, r *http.Re
 		fmt.Println(post)
 		fmt.Println("post added to db")
 
-		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 
 	} else {
 
@@ -178,7 +143,8 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 
 		cph.tmpl.ExecuteTemplate(w, "post_update.layout", post)
 
-	} else if r.Method == http.MethodPost {
+	}
+	if r.Method == http.MethodPost {
 
 		pst := &entity.Post{}
 
@@ -215,10 +181,8 @@ func (cph *CompanyPostHandler) CompanyPostUpdate(w http.ResponseWriter, r *http.
 			panic(errs)
 		}
 
-		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 
-	} else {
-		http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
 	}
 
 }
@@ -244,7 +208,7 @@ func (cph *CompanyPostHandler) CompanyPostDelete(w http.ResponseWriter, r *http.
 
 	}
 
-	http.Redirect(w, r, "/admin/cmp-posts", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
 func writeFile(mf *multipart.File, fname string) {

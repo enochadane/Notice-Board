@@ -30,14 +30,6 @@ func NewApplicationHandler(T *template.Template, AP application.ApplicationServi
 // Applications handle requests on route /applications
 func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Request) {
 
-	cookie, _ := r.Cookie("session")
-
-	s, serr := ap.sessionService.Session(cookie.Value)
-
-	if len(serr) > 0 {
-		panic(serr)
-	}
-
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
@@ -45,9 +37,10 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 
 	userApplications := []entity.Application{}
 
-	// var pstid uint
+	handler := UserHandler{loggedInUser: currentUser}
+
 	for _, app := range apps {
-		if s.UserID == app.UserID {
+		if handler.loggedInUser.ID == app.UserID {
 			userApplications = append(userApplications, app)
 			// pstid = app.PostID
 		}
@@ -85,28 +78,12 @@ func (ap *ApplicationHandler) Applications(w http.ResponseWriter, r *http.Reques
 // CompanyReceivedApplications handle requests on route /received/applications
 func(ap *ApplicationHandler) CompanyReceivedApplications(w http.ResponseWriter, r *http.Request) {
 
-	// cookie, _ := r.Cookie("session")
-
-	// s, serr := ap.userSrv.Session(cookie.Value)
-
-	// if len(serr) > 0 {
-	// 	panic(serr)
-	// }
-
 	apps, errs := ap.appSrv.Applications()
 	if len(errs) > 0 {
 		panic(errs)
 	}
 
 	userApplications := []entity.Application{}
-
-	// // var pstid uint
-	// for _, app := range apps {
-	// 	if s.UserID == app.UserID {
-	// 		userApplications = append(userApplications, app)
-	// 		// pstid = app.PostID
-	// 	}
-	// }
 
 	posts, perr := ap.postSrv.Posts()
 
@@ -184,7 +161,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		ap.tmpl.ExecuteTemplate(w, "user_application.layout", post)
 
-	} 
+	}
 
 	if r.Method == http.MethodPost {
 
@@ -204,10 +181,9 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 
 		writeFile(&mf, fh.Filename)
 
-		cookie, _ := r.Cookie("session")
-		s, errs := ap.sessionService.Session(cookie.Value)
+		handler := UserHandler{loggedInUser: currentUser}
 
-		app.UserID = s.UserID
+		app.UserID = handler.loggedInUser.ID
 		pstID, err := strconv.Atoi(r.FormValue("id"))
 
 		if err != nil {
@@ -218,17 +194,11 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		
 		fmt.Println(pstID)
 
-		// reqBody, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 		log.Fatal(err)
-		// }
-
-		// fmt.Printf("%s\n", reqBody)
 		
 		fmt.Println(pstID)
 		fmt.Println(r.FormValue("id"))
 
-		_, errs = ap.appSrv.StoreApplication(app)
+		_, errs := ap.appSrv.StoreApplication(app)
 
 		if len(errs) > 0 {
 			panic(errs)
@@ -237,7 +207,7 @@ func (ap *ApplicationHandler) Apply(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	} else {
 
-		// ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
+		ap.tmpl.ExecuteTemplate(w, "user_application.layout", nil)
 	}
 }
 
@@ -305,8 +275,6 @@ func (ap *ApplicationHandler) ApplicationUpdate(w http.ResponseWriter, r *http.R
 
 		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 
-	} else {
-		http.Redirect(w, r, "/applications", http.StatusSeeOther)
 	}
 
 }
