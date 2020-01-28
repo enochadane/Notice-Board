@@ -100,8 +100,8 @@ func (cRepo *CompanyGormRepo) EmailExists(email string) bool {
 	return true
 }
 
-//UserRoles returns list of application roles that a given user has
-func (cRepo *CompanyGormRepo) UserRoles(company *entity.Company) ([]entity.Role, []error) {
+//CompanyRoles returns list of application roles that a given user has
+func (cRepo *CompanyGormRepo) CompanyRoles(company *entity.Company) ([]entity.Role, []error) {
 	companyRoles := []entity.Role{}
 	errs := cRepo.conn.Model(company).Related(&companyRoles).GetErrors()
 	if len(errs) > 0 {

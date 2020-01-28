@@ -12,7 +12,7 @@ type CompanyRepository interface {
 	StoreCompany(company *entity.Company) (*entity.Company, []error)
 	PhoneExists(phone string) bool
 	EmailExists(email string) bool
-	UserRoles(company *entity.Company) ([]entity.Role, []error)
+	CompanyRoles(company *entity.Company) ([]entity.Role, []error)
 	
 }
 

@@ -7,6 +7,8 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"strings"
+
 	// "time"
 
 	"github.com/amthesonofGod/Notice-Board/company"
@@ -29,6 +31,7 @@ type CompanyHandler struct {
 	sessionService   	company.SessionServiceCamp
 	campSess         	*entity.CompanySession
 	loggedInUserCamp 	*entity.Company
+	companyRole			company.RoleService
 	csrfSignKey    	  	[]byte
 }
 
@@ -38,8 +41,8 @@ type cntextKey string
 var ctxCompanySessionKey = cntextKey("signed_in_company_session")
 
 // NewCompanyHandler initializes and returns new NewCompanyHandler
-func NewCompanyHandler(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession) *CompanyHandler {
-	return &CompanyHandler{tmpl: T, companySrv: CS, postSrv: PS, sessionService: sessServ, campSess: campSess}
+func NewCompanyHandler(T *template.Template, CS company.CompanyService, PS post.PostService, sessServ company.SessionServiceCamp, campSess *entity.CompanySession, csKey []byte) *CompanyHandler {
+	return &CompanyHandler{tmpl: T, companySrv: CS, postSrv: PS, sessionService: sessServ, campSess: campSess, csrfSignKey:csKey}
 }
 
 // Authenticated ...
@@ -63,7 +66,7 @@ func (ch *CompanyHandler) Authorized(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		roles, errs := ch.companySrv.UserRoles(ch.loggedInUserCamp)
+		roles, errs := ch.companySrv.CompanyRoles(ch.loggedInUserCamp)
 		if len(errs) > 0 {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
@@ -116,11 +119,6 @@ func (ch *CompanyHandler) loggedIn(r *http.Request) bool {
 // Login handle requests on /cmp-login
 func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 
-	// cookie, errc := r.Cookie("session")
-	
-	// expireToken := time.Now().Add(time.Minute*30).Unix()
-	// expireCookie := time.Now().Add(time.Minute*30)
-
 	token, err := rtoken.CSRFToken(ch.csrfSignKey)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -151,16 +149,8 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// email := r.FormValue("companyemail")
-		// password := r.FormValue("companypassword")
-
-		// companies, err := ch.companySrv.Companies()
-		// if err != nil {
-		// 	panic(err)
-		// }
-
-		match := CheckPasswordHash(r.FormValue("companypassword"), cmp.Password)
-		fmt.Println("Match:   ", match)
+		//match := CheckPasswordHash(r.FormValue("companypassword"), cmp.Password)
+		//fmt.Println("Match:   ", match)
 
 		err := bcrypt.CompareHashAndPassword([]byte(cmp.Password), []byte(r.FormValue("companypassword")))
 		if err == bcrypt.ErrMismatchedHashAndPassword {
@@ -173,30 +163,8 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 		ch.loggedInUserCamp = cmp
 		currentCompUser = ch.loggedInUserCamp
 		claims := rtoken.Claims(cmp.Email, ch.campSess.Expires)
-		
-		// claims := rtoken.Claims(email, expireToken)
-		// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		// signedToken, _ := token.SignedString([]byte(email))
 
-		// if errc == http.ErrNoCookie {
-		// 	// sID, _ := uuid.NewV4()
-		// 	cookie = &http.Cookie{
-		// 		Name:  "session",
-		// 		Value: signedToken,
-		// 		Expires: expireCookie,
-		// 		Path:  "/",
-		// 	}
-		// }
-
-		// session := &entity.CompanySession{}
-		// session.UUID = cookie.Value
-		// session.CompanyID = cmp.ID
-
-		ch.campSess.CompanyID = cmp.ID
-
-		id := uint(ch.campSess.CompanyID)
-
-		session.Create(id, claims, ch.campSess.UUID, ch.campSess.SigningKey, w)
+		session.Create(claims, ch.campSess.UUID, ch.campSess.SigningKey, w)
 
 		newSess, errs := ch.sessionService.StoreSessionCamp(ch.campSess)
 
@@ -208,19 +176,19 @@ func (ch *CompanyHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 		ch.campSess = newSess
 
-		// http.SetCookie(w, cookie)
-		http.Redirect(w, r, "/cmp-home", http.StatusSeeOther)
+		roles, _ := ch.companySrv.CompanyRoles(cmp)
+		if ch.checkAdmin(roles) {
+			http.Redirect(w, r, "/admin/home", http.StatusSeeOther)
+			return
+		}
+
+		http.Redirect(w, r, "/admin/home", http.StatusSeeOther)
 
 	} 
 }
 
-// CreateAccount handle requests on /cmp-signup-account
+// CreateAccount handle requests on /admin/signup
 func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-
-	// cookie, errc := r.Cookie("session")
-	
-	// expireToken := time.Now().Add(time.Minute*30).Unix()
-	// expireCookie := time.Now().Add(time.Minute*30)
 
 	token, err := rtoken.CSRFToken(ch.csrfSignKey)
 	if err != nil {
@@ -241,25 +209,7 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	
 	if r.Method == http.MethodPost {
-
-		// cmp := &entity.Company{}
-		// cmp.Name = r.FormValue("companyname")
-		// cmp.Email = r.FormValue("companyemail")
-		// password := r.FormValue("companypassword")
-		// confirmpass := r.FormValue("confirmPassword")
-
-		// companies, _ := ch.companySrv.Companies()
-
-		// for _, company := range companies {
-
-		// 	if cmp.Email == company.Email {
-		// 		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
-		// 		fmt.Println("This Email is already in use! ")
-		// 		return
-		// 	}
-		// }
 
 		// Parsing the form data
 		err := r.ParseForm()
@@ -269,19 +219,18 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 
 		// Validate the form contents
 		singnUpForm := form.Input{Values: r.PostForm, VErrors: form.ValidationErrors{}}
-		// singnUpForm.Required("companyname", "companyemail", "companypassword", "confirmpassword")
+		singnUpForm.Required("companyname", "companyemail", "companypassword", "confirmpassword")
 		singnUpForm.MatchesPattern("companyemail", form.EmailRX)
-		// singnUpForm.MatchesPattern("phone", form.PhoneRX)
 		singnUpForm.MinLength("companypassword", 8)
-		// singnUpForm.PasswordMatches("companypassword", "confirmpassword")
+		singnUpForm.PasswordMatches("companypassword", "confirmpassword")
 		singnUpForm.CSRF = token
+
 		// If there are any errors, redisplay the signup form.
 		if !singnUpForm.Valid() {
 			ch.tmpl.ExecuteTemplate(w, "company_signin_signup.html", singnUpForm)
 			return
 		}
 
-		
 		eExists := ch.companySrv.EmailExists(r.FormValue("companyemail"))
 		if eExists {
 			singnUpForm.VErrors.Add("email", "Email Already Exists")
@@ -296,70 +245,35 @@ func (ch *CompanyHandler) CreateAccount(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		// cmp.Password = string(hashedPassword)
+		//role, errs := ch.companyRole.RoleByName("ADMIN")
+		//
+		//if len(errs) > 0 {
+		//	singnUpForm.VErrors.Add("role", "could not assign role to the user")
+		//	ch.tmpl.ExecuteTemplate(w, "signup.layout", singnUpForm)
+		//	return
+		//}
 
 		company := &entity.Company{
 			Name: r.FormValue("companyname"),
 			Email: r.FormValue("companyemail"),
 			Password: string(hashedPassword),
+			RoleID: 0,
 		}
 
 		_, errs := ch.companySrv.StoreCompany(company)
 
 		if len(errs) > 0 {
-			fmt.Println("errrrrr")
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
-
-		// claims := rtoken.Claims(cmp.Email, expireToken)
-		// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		// signedToken, _ := token.SignedString([]byte(cmp.Email))
-
-		// if errc == http.ErrNoCookie {
-		// 	// sID, _ := uuid.NewV4()
-		// 	cookie = &http.Cookie{
-		// 		Name:  "session",
-		// 		Value: signedToken,
-		// 		Expires: expireCookie,
-		// 		Path:  "/",
-		// 	}
-		// }
-
-		// session := &entity.CompanySession{}
-		// session.UUID = cookie.Value
-		// session.CompanyID = cmp.ID
-
-		// _, errs = ch.sessionService.StoreSessionCamp(session)
-
-		// if len(errs) > 0 {
-		// 	panic(errs)
-		// }
-
-		// fmt.Println(cmp)
-
-		// fmt.Println(cookie.Value)
-
-		// fmt.Println("Company added to db")
-
-		// http.SetCookie(w, cookie)
-		
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 
 	} 
 }
 
 // Home handle requests on /cmp-home
 func (ch *CompanyHandler) Home(w http.ResponseWriter, r *http.Request) {
-
-	// get cookie
-	_, err := r.Cookie(ch.campSess.UUID)
-	if err != nil {
-		fmt.Println("no cookie")
-		http.Redirect(w, r, "/cmp", http.StatusSeeOther)
-		return
-	}
 
 	posts, _ := ch.postSrv.Posts()
 
@@ -377,5 +291,16 @@ func (ch *CompanyHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	session.Remove(ch.campSess.UUID, w)
 	ch.sessionService.DeleteSessionCamp(ch.campSess.UUID)
 
-	http.Redirect(w, r, "/cmp", 302)
+	http.Redirect(w, r, "/admin", 302)
 }
+
+func (ch *CompanyHandler) checkAdmin(rs []entity.Role) bool {
+	for _, r := range rs {
+		if strings.ToUpper(r.Name) == strings.ToUpper("Admin") {
+			return true
+		}
+	}
+	return false
+}
+
+

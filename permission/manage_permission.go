@@ -16,11 +16,11 @@ var authorities = authority{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},
-	"/login": permission{
+	"/join": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},
-	"/join": permission{
+	"/login": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET"},
 	},
@@ -36,7 +36,11 @@ var authorities = authority{
 		roles:   []string{"USER"},
 		methods: []string{"GET"},
 	},
-	"/order": permission{
+	"/applications": permission{
+		roles:   []string{"USER"},
+		methods: []string{"GET", "POST"},
+	},
+	"/requests": permission{
 		roles:   []string{"USER"},
 		methods: []string{"GET", "POST"},
 	},
@@ -44,6 +48,10 @@ var authorities = authority{
 		roles:   []string{"ADMIN"},
 		methods: []string{"GET", "POST"},
 	},
+	// "/admin/posts/new": permission{
+	// 	roles:   []string{"ADMIN"},
+	// 	methods: []string{"GET", "POST"},
+	// },
 }
 
 // HasPermission checks if a given role has permission to access a given route for a given method

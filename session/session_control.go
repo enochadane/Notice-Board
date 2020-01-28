@@ -11,7 +11,7 @@ import (
 )
 
 // Create creates and sets session cookie
-func Create(ID uint, claims jwt.Claims, sessionID string, signingKey []byte, w http.ResponseWriter) {
+func Create(claims jwt.Claims, sessionID string, signingKey []byte, w http.ResponseWriter) {
 
 	signedString, err := rtoken.Generate(signingKey, claims)
 	if err != nil {

@@ -15,10 +15,10 @@ type CompanyService interface {
 	StoreCompany(company *entity.Company) (*entity.Company, []error)
 	PhoneExists(phone string) bool
 	EmailExists(email string) bool
-	UserRoles(company *entity.Company) ([]entity.Role, []error)
+	CompanyRoles(company *entity.Company) ([]entity.Role, []error)
 }
 
-// RoleRepository speifies application user role related database operations
+// RoleService speifies application user role related database operations
 type RoleService interface {
 	Roles() ([]entity.Role, []error)
 	Role(id uint) (*entity.Role, []error)

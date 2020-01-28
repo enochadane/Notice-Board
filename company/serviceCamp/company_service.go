@@ -95,9 +95,9 @@ func (cs *CompanyService) EmailExists(email string) bool {
 	return exists
 }
 
-// UserRoles returns list of roles a user has
-func (cs *CompanyService) UserRoles(company *entity.Company) ([]entity.Role, []error) {
-	companyRoles, errs := cs.companyRepo.UserRoles(company)
+// CompanyRoles returns list of roles a user has
+func (cs *CompanyService) CompanyRoles(company *entity.Company) ([]entity.Role, []error) {
+	companyRoles, errs := cs.companyRepo.CompanyRoles(company)
 	if len(errs) > 0 {
 		return nil, errs
 	}
